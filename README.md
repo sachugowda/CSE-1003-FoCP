@@ -25,22 +25,6 @@ For each topic you'll find **📖 notes** to read, **🎥 videos** to watch, and
 | 13 | Flowcharts | [Algorithm vs Flowchart (GfG)](https://www.geeksforgeeks.org/dsa/difference-between-algorithm-and-flowchart/) | [NPTEL Week 1: flowcharts](https://nptel.ac.in/courses/106105171) | [Flowgorithm](http://www.flowgorithm.org/) (runs your flowchart, Windows) · [draw.io](https://app.diagrams.net/) |
 | 14 | Pseudocode | [What is Pseudocode (GfG)](https://www.geeksforgeeks.org/dsa/what-is-pseudocode-a-complete-tutorial/) | [NPTEL Week 1: pseudocode](https://nptel.ac.in/courses/106105171) | [Flowgorithm](http://www.flowgorithm.org/): shows the code for your flowchart |
 
-> **Crash Course Computer Science**, full playlist: <https://www.youtube.com/playlist?list=PL8dPuuaLjXtNlUrzyH5r6jN9ulIgZBpdo>
-
----
-
-## 🧪 Play area: tools you'll use all semester
-
-| Tool | What it's for | Link |
-|---|---|---|
-| W3Schools C | Read a short lesson, then click **Try it Yourself** | <https://www.w3schools.com/c/> |
-| OnlineGDB | Write, run and **debug** C in the browser, with keyboard input | <https://www.onlinegdb.com/> |
-| Python Tutor (C mode) | Watch variables change line by line | <https://pythontutor.com/c.html> |
-| Compiler Explorer | See the assembly your C code becomes | <https://godbolt.org/> |
-| Flowgorithm | Draw a flowchart and **run** it | <http://www.flowgorithm.org/> |
-| draw.io | Draw flowcharts for your lab record | <https://app.diagrams.net/> |
-| Cisco Binary Game | Practise binary conversions against the clock | <https://learningnetwork.cisco.com/s/binary-game> |
-
 ---
 
 ## ✍️ Module 1 self-check
