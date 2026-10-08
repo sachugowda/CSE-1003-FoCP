@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FoCP Practice: Module 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bench: #EEF1F4;
+    --panel: #FFFFFF;
+    --line: #D3DAE3;
+    --ink: #14202E;
+    --muted: #5A6778;
+    --signal: #F2A900;
+    --signal-soft: #FFF3D1;
+    --wire: #1F5FBF;
+    --wire-soft: #E4ECF8;
+    --good: #1E7A50;
+    --good-soft: #E1F2E9;
+    --bad: #B8332A;
+    --bad-soft: #FAE5E3;
+    --sans: "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+    --mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bench);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 32px 20px 56px; }
+
+  header h1 { font-size: 30px; line-height: 1.2; margin: 0 0 6px; font-weight: 700; }
+  header p { margin: 0; color: var(--muted); }
+
+  .tabs { display: flex; gap: 6px; margin: 28px 0 0; border-bottom: 2px solid var(--line); flex-wrap: wrap; }
+  .tab {
+    font: 600 16px var(--sans); color: var(--muted);
+    background: none; border: none; padding: 10px 14px 12px; cursor: pointer;
+    border-bottom: 3px solid transparent; margin-bottom: -2px;
+  }
+  .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--wire); }
+  .tab:hover { color: var(--ink); }
+
+  .panel { background: var(--panel); border: 1px solid var(--line); border-top: none; border-radius: 0 0 10px 10px; padding: 26px 24px 28px; }
+  .panel[hidden] { display: none; }
+
+  .bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 22px; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .seg button { font: 500 15px var(--sans); border: none; background: var(--panel); color: var(--muted); padding: 7px 12px; cursor: pointer; }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .seg button[aria-pressed="true"] { background: var(--wire-soft); color: var(--wire); font-weight: 600; }
+  .score { font-size: 15px; color: var(--muted); }
+  .score b { color: var(--ink); }
+
+  .prompt { font-size: 19px; margin: 0 0 4px; }
+  .target { font: 600 64px/1.1 var(--mono); margin: 6px 0 22px; letter-spacing: 1px; }
+  .target small { font: 500 18px var(--sans); color: var(--muted); margin-left: 8px; letter-spacing: 0; }
+
+  /* switches: the one bold element */
+  .board { display: flex; gap: 8px; justify-content: flex-start; margin: 4px 0 8px; flex-wrap: nowrap; }
+  .sw { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 0 1 64px; min-width: 34px; }
+  .sw .bit { font: 600 18px var(--mono); color: var(--muted); }
+  .sw.on .bit { color: var(--ink); }
+  .toggle {
+    width: 100%; max-width: 54px; height: 92px; border-radius: 10px;
+    background: #2A3442; border: 2px solid #1A222D; position: relative; cursor: pointer; padding: 0;
+  }
+  .toggle::after {
+    content: ""; position: absolute; left: 6px; right: 6px; height: 38px; bottom: 6px;
+    border-radius: 7px; background: #5E6B7C; transition: bottom .15s ease, background .15s ease, box-shadow .15s ease;
+  }
+  .sw.on .toggle::after { bottom: 44px; background: var(--signal); box-shadow: 0 0 18px 4px rgba(242,169,0,.55); }
+  .toggle:disabled { cursor: default; }
+  .sw .w { font: 500 14px var(--mono); color: var(--muted); }
+  .live { font: 500 16px var(--mono); color: var(--muted); margin: 8px 0 18px; min-height: 24px; }
+
+  input[type="text"], input[type="number"] {
+    font: 600 26px var(--mono); width: 200px; padding: 8px 12px;
+    border: 2px solid var(--line); border-radius: 8px; color: var(--ink); background: var(--panel);
+  }
+  input:focus { outline: none; border-color: var(--wire); }
+
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 18px; }
+  .btn { font: 600 16px var(--sans); border-radius: 8px; padding: 10px 18px; cursor: pointer; border: 2px solid var(--wire); }
+  .btn.primary { background: var(--wire); color: #fff; }
+  .btn.ghost { background: var(--panel); color: var(--wire); }
+  .btn:disabled { opacity: .45; cursor: default; }
+
+  .feedback { margin-top: 18px; padding: 14px 16px; border-radius: 8px; display: none; }
+  .feedback.show { display: block; }
+  .feedback.ok { background: var(--good-soft); color: var(--good); }
+  .feedback.no { background: var(--bad-soft); color: var(--bad); }
+  .feedback p { margin: 4px 0 0; color: var(--ink); }
+  .feedback strong { font-size: 17px; }
+
+  pre {
+    background: #14202E; color: #E6EBF2; font: 15.5px/1.6 var(--mono);
+    padding: 16px 18px; border-radius: 8px; overflow-x: auto; margin: 10px 0 18px;
+  }
+  .task { color: var(--muted); margin: 0 0 4px; }
+  .choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+  .choice { font: 600 16px var(--sans); text-align: left; padding: 12px 14px; border-radius: 8px; border: 2px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+  .choice:hover:not(:disabled) { border-color: var(--wire); }
+  .choice.right { border-color: var(--good); background: var(--good-soft); color: var(--good); }
+  .choice.wrong { border-color: var(--bad); background: var(--bad-soft); color: var(--bad); }
+  .choice:disabled { cursor: default; }
+
+  table.trace { border-collapse: collapse; margin-top: 12px; font-family: var(--mono); font-size: 15px; }
+  table.trace th, table.trace td { border: 1px solid var(--line); padding: 5px 14px; text-align: right; }
+  table.trace th { background: var(--bench); font-weight: 600; }
+
+
+  .steps { display: flex; flex-direction: column; gap: 8px; }
+  .step { font: 500 16px var(--sans); text-align: left; padding: 10px 14px; border-radius: 8px; border: 2px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+  .step:hover:not(:disabled) { border-color: var(--wire); }
+  .step:disabled { opacity: .35; cursor: default; }
+  .fixed { padding: 8px 14px; border-radius: 8px; background: var(--bench); color: var(--muted); font-weight: 600; }
+  ol.mine { margin: 6px 0 0; padding-left: 26px; min-height: 30px; }
+  ol.mine li { padding: 5px 0; }
+  ol.mine li.right { color: var(--good); } ol.mine li.wrong { color: var(--bad); }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 620px) { .cols { grid-template-columns: 1fr; } }
+  .h3 { font-weight: 600; margin: 0 0 6px; }
+  .shape-choice { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+  .shape-choice svg { width: 96px; height: 52px; }
+  .statement { font: 600 26px var(--mono); margin: 8px 0 20px; padding: 14px 18px; background: var(--bench); border-radius: 8px; }
+
+  .help { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: var(--wire-soft); border: 1px solid var(--line); border-top: none; padding: 10px 16px; font-size: 15px; }
+  .help span:first-child { flex: 1 1 260px; }
+  .btn.small { padding: 6px 12px; font-size: 14px; text-decoration: none; display: inline-block; }
+  .copied { color: var(--good); font-weight: 600; }
+  .tip { margin-top: 26px; font-size: 15px; color: var(--muted); }
+  footer { margin-top: 28px; font-size: 14px; color: var(--muted); }
+
+  button:focus-visible, .tab:focus-visible, .toggle:focus-visible { outline: 3px solid var(--wire); outline-offset: 2px; }
+  @media (max-width: 520px) {
+    .target { font-size: 48px; }
+    .toggle { height: 78px; }
+    .toggle::after { height: 31px; }
+    .sw.on .toggle::after { bottom: 37px; }
+    .panel { padding: 22px 16px 24px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .toggle::after { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Module 1 practice</h1>
+    <p>Fundamentals of Computer Programming (CSE-1003), IIIT Bhopal. Practise as often as you like; every question is new.</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="t-bin" aria-controls="p-bin" aria-selected="true">Binary switches</button>
+    <button class="tab" role="tab" id="t-err" aria-controls="p-err" aria-selected="false">Name the error</button>
+    <button class="tab" role="tab" id="t-trc" aria-controls="p-trc" aria-selected="false">Trace the loop</button>
+    <button class="tab" role="tab" id="t-alg" aria-controls="p-alg" aria-selected="false">Algorithms and flowcharts</button>
+  </div>
+
+  <div class="help" id="help">
+    <span>Stuck? Copy the question and ask the course assistant for a hint.</span>
+    <button class="btn ghost small" id="copy-q">Copy question</button>
+    <a class="btn primary small" id="ask-link" target="_blank" rel="noopener">Open assistant</a>
+    <span class="copied" id="copied" aria-live="polite"></span>
+  </div>
+
+  <!-- BINARY -->
+  <section class="panel" id="p-bin" role="tabpanel" aria-labelledby="t-bin">
+    <div class="bar">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <div class="seg" aria-label="Direction">
+          <button data-dir="d2b" aria-pressed="true">Decimal to binary</button>
+          <button data-dir="b2d" aria-pressed="false">Binary to decimal</button>
+        </div>
+        <div class="seg" aria-label="Size">
+          <button data-bits="4" aria-pressed="true">4 bits</button>
+          <button data-bits="8" aria-pressed="false">8 bits</button>
+        </div>
+      </div>
+      <div class="score" id="s-bin"></div>
+    </div>
+    <p class="prompt" id="bin-prompt"></p>
+    <div class="target" id="bin-target"></div>
+    <div class="board" id="board"></div>
+    <div class="live" id="bin-live" aria-live="polite"></div>
+    <div id="bin-input-wrap" hidden>
+      <label for="bin-input" class="task">Your answer in decimal</label><br>
+      <input type="number" id="bin-input" inputmode="numeric" min="0" max="255">
+    </div>
+    <div class="actions">
+      <button class="btn primary" id="bin-check">Check</button>
+      <button class="btn ghost" id="bin-next">Next number</button>
+    </div>
+    <div class="feedback" id="bin-fb" aria-live="polite"></div>
+    <p class="tip">Each switch has a place value. Turn on the switches whose values add up to the number.</p>
+  </section>
+
+  <!-- ERRORS -->
+  <section class="panel" id="p-err" role="tabpanel" aria-labelledby="t-err" hidden>
+    <div class="bar">
+      <p class="task" id="err-count" style="margin:0"></p>
+      <div class="score" id="s-err"></div>
+    </div>
+    <p class="prompt" id="err-task"></p>
+    <pre><code id="err-code"></code></pre>
+    <p class="task">What kind of error does this program have?</p>
+    <div class="choices" id="err-choices"></div>
+    <div class="feedback" id="err-fb" aria-live="polite"></div>
+    <div class="actions"><button class="btn ghost" id="err-next">Next program</button></div>
+  </section>
+
+  <!-- TRACE -->
+  <section class="panel" id="p-trc" role="tabpanel" aria-labelledby="t-trc" hidden>
+    <div class="bar">
+      <p class="task" style="margin:0">Work it out on paper first, one pass of the loop at a time.</p>
+      <div class="score" id="s-trc"></div>
+    </div>
+    <pre><code id="trc-code"></code></pre>
+    <label for="trc-input" class="prompt" id="trc-ask"></label><br>
+    <input type="number" id="trc-input" inputmode="numeric" style="margin-top:8px">
+    <div class="actions">
+      <button class="btn primary" id="trc-check">Check</button>
+      <button class="btn ghost" id="trc-next">Next loop</button>
+    </div>
+    <div class="feedback" id="trc-fb" aria-live="polite"></div>
+  </section>
+
+  <!-- ALGORITHMS AND FLOWCHARTS -->
+  <section class="panel" id="p-alg" role="tabpanel" aria-labelledby="t-alg" hidden>
+    <div class="bar">
+      <div class="seg" aria-label="Practice type" style="flex-wrap:wrap">
+        <button data-am="order" aria-pressed="true">Order the steps</button>
+        <button data-am="symbol" aria-pressed="false">Flowchart symbols</button>
+        <button data-am="pseudo" aria-pressed="false">Read the pseudocode</button>
+        <button data-am="prop" aria-pressed="false">Spot the flaw</button>
+      </div>
+      <div class="score" id="s-alg"></div>
+    </div>
+    <div id="alg-body"></div>
+    <div class="feedback" id="alg-fb" aria-live="polite"></div>
+    <div class="actions" id="alg-actions"></div>
+  </section>
+
+  <footer>CSE-1003 Fundamentals of Computer Programming, IIIT Bhopal</footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var rand = function (a, b) { return a + Math.floor(Math.random() * (b - a + 1)); };
+  var esc = function (s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); };
+  var $ = function (id) { return document.getElementById(id); };
+
+  /* ---------- scores (kept in this browser only) ---------- */
+  var scores = { bin: {r:0,t:0,s:0,best:0}, err: {r:0,t:0,s:0,best:0}, trc: {r:0,t:0,s:0,best:0} };
+  try { var saved = JSON.parse(localStorage.getItem("focp-m1-best") || "{}");
+        Object.keys(saved).forEach(function (k) { if (scores[k]) scores[k].best = saved[k]; }); } catch (e) {}
+  function record(k, ok) {
+    var s = scores[k]; s.t++; if (ok) { s.r++; s.s++; } else { s.s = 0; }
+    if (s.s > s.best) { s.best = s.s;
+      try { var b = {}; Object.keys(scores).forEach(function (x) { b[x] = scores[x].best; });
+            localStorage.setItem("focp-m1-best", JSON.stringify(b)); } catch (e) {} }
+    showScore(k);
+  }
+  function showScore(k) { var s = scores[k];
+    $("s-" + k).innerHTML = "Correct <b>" + s.r + "/" + s.t + "</b>, streak <b>" + s.s + "</b>, best <b>" + s.best + "</b>"; }
+  ["bin","err","trc"].forEach(showScore);
+
+  function feedback(id, ok, title, body) {
+    var f = $(id); f.className = "feedback show " + (ok ? "ok" : "no");
+    f.innerHTML = "<strong>" + title + "</strong>" + (body ? "<p>" + body + "</p>" : "");
+  }
+  function clearFb(id) { $(id).className = "feedback"; $(id).innerHTML = ""; }
+
+  /* ---------- tabs ---------- */
+  var tabs = document.querySelectorAll(".tab");
+  tabs.forEach(function (t) { t.addEventListener("click", function () {
+    tabs.forEach(function (x) { x.setAttribute("aria-selected", x === t ? "true" : "false");
+      $(x.getAttribute("aria-controls")).hidden = x !== t; });
+  }); });
+
+  /* ---------- binary ---------- */
+  var B = { dir: "d2b", bits: 4, target: 0, user: [], done: false };
+  function weights() { var w = []; for (var i = B.bits - 1; i >= 0; i--) w.push(Math.pow(2, i)); return w; }
+  function toBits(n) { return weights().map(function (w) { return (n & w) ? 1 : 0; }); }
+  function value(arr) { var w = weights(); return arr.reduce(function (a, b, i) { return a + b * w[i]; }, 0); }
+  function breakdown(n) { var parts = weights().filter(function (w) { return n & w; });
+    return n + " = " + (parts.length ? parts.join(" + ") : "0") + ", so the bits are " + toBits(n).join(""); }
+
+  function drawBoard() {
+    var w = weights(), board = $("board"); board.innerHTML = "";
+    var shown = B.dir === "d2b" ? B.user : toBits(B.target);
+    w.forEach(function (wt, i) {
+      var on = shown[i] === 1;
+      var sw = document.createElement("div"); sw.className = "sw" + (on ? " on" : "");
+      sw.innerHTML = '<span class="bit">' + (on ? 1 : 0) + '</span><button class="toggle" aria-pressed="' + on +
+        '" aria-label="Switch worth ' + wt + '"' + (B.dir === "b2d" || B.done ? " disabled" : "") + '></button><span class="w">' + wt + "</span>";
+      if (B.dir === "d2b") sw.querySelector("button").addEventListener("click", function () {
+        if (B.done) return; B.user[i] = B.user[i] ? 0 : 1; drawBoard(); });
+      board.appendChild(sw);
+    });
+    $("bin-live").textContent = B.dir === "d2b" ? "Your switches make " + value(B.user) : "";
+  }
+  function newBin() {
+    var max = Math.pow(2, B.bits) - 1, n;
+    do { n = rand(1, max); } while (n === B.target);
+    B.target = n; B.user = new Array(B.bits).fill(0); B.done = false;
+    if (B.dir === "d2b") {
+      $("bin-prompt").textContent = "Turn on the switches to show this number in binary";
+      $("bin-target").innerHTML = n + "<small>in decimal</small>";
+      $("bin-input-wrap").hidden = true;
+    } else {
+      $("bin-prompt").textContent = "These switches show a binary number. What is it in decimal?";
+      $("bin-target").innerHTML = toBits(n).join("") + "<small>in binary</small>";
+      $("bin-input-wrap").hidden = false; $("bin-input").value = "";
+    }
+    $("bin-check").disabled = false; clearFb("bin-fb"); drawBoard();
+  }
+  $("bin-check").addEventListener("click", function () {
+    if (B.done) return;
+    var ok;
+    if (B.dir === "d2b") { ok = value(B.user) === B.target; }
+    else { var v = $("bin-input").value.trim(); if (v === "") { feedback("bin-fb", false, "Type a number first.", ""); return; }
+           ok = parseInt(v, 10) === B.target; }
+    B.done = true; $("bin-check").disabled = true; record("bin", ok); drawBoard();
+    feedback("bin-fb", ok, ok ? "Correct." : "Not quite.", breakdown(B.target));
+  });
+  $("bin-next").addEventListener("click", newBin);
+  $("bin-input").addEventListener("keydown", function (e) { if (e.key === "Enter") $("bin-check").click(); });
+  document.querySelectorAll("[data-dir]").forEach(function (b) { b.addEventListener("click", function () {
+    B.dir = b.dataset.dir; document.querySelectorAll("[data-dir]").forEach(function (x) { x.setAttribute("aria-pressed", x === b); }); newBin(); }); });
+  document.querySelectorAll("[data-bits]").forEach(function (b) { b.addEventListener("click", function () {
+    B.bits = +b.dataset.bits; document.querySelectorAll("[data-bits]").forEach(function (x) { x.setAttribute("aria-pressed", x === b); }); newBin(); }); });
+
+  /* ---------- name the error ---------- */
+  var KINDS = ["Syntax error", "Linker error", "Runtime error", "Logical error", "No error"];
+  var BANK = [
+    { task: "Print a welcome message.", code: '#include <stdio.h>\n\nint main(void) {\n    printf("Welcome to the canteen\\n")\n    return 0;\n}', a: 0,
+      why: "The semicolon after printf is missing. The compiler stops and points at the line, so the program never runs." },
+    { task: "Print a welcome message.", code: '#include <stdio.h>\n\nint mian(void) {\n    printf("Welcome\\n");\n    return 0;\n}', a: 1,
+      why: "main is spelt mian. Each part compiles, but the linker cannot find main: \"undefined reference to main\"." },
+    { task: "Share 100 rupees equally among some friends.", code: '#include <stdio.h>\n\nint main(void) {\n    int friends;\n    scanf("%d", &friends);\n    printf("Each gets %d\\n", 100 / friends);\n    return 0;\n}\n\n/* the user enters 0 */', a: 2,
+      why: "It compiles and runs, but dividing by 0 crashes the program while it is running." },
+    { task: "Find the area of a rectangle 8 cm by 5 cm.", code: '#include <stdio.h>\n\nint main(void) {\n    int length = 8, breadth = 5;\n    int area = length + breadth;\n    printf("Area = %d\\n", area);\n    return 0;\n}', a: 3,
+      why: "It runs and prints 13, but the area is 40. Area needs length * breadth. Nothing warns you about this." },
+    { task: "Average three students' marks: 85, 90 and 78.", code: '#include <stdio.h>\n\nint main(void) {\n    int a = 85, b = 90, c = 78;\n    float avg = (a + b + c) / 3;\n    printf("%.2f\\n", avg);\n    return 0;\n}', a: 3,
+      why: "It prints 84.00 instead of 84.33. All three are int, so 253 / 3 is integer division. Divide by 3.0 instead." },
+    { task: "Congratulate only students who scored 100.", code: '#include <stdio.h>\n\nint main(void) {\n    int marks = 72;\n    if (marks = 100)\n        printf("Full marks!\\n");\n    return 0;\n}', a: 3,
+      why: "= stores 100 in marks, so the condition is always true and everyone gets \"Full marks!\". Use == to compare." },
+    { task: "Print the bill total.", code: '#include <stdio.h>\n\nint main(void) {\n    int chai = 20, samosa = 15;\n    printf("Total = %d\\n", chai + samosa);\n    return 0;\n', a: 0,
+      why: "The closing brace } of main is missing. The compiler reports it as a syntax error at the end of the file." },
+    { task: "Print the numbers 1 to 5.", code: '#include <stdio.h>\n\nint main(void) {\n    for (int i = 1; i <= 5; i--)\n        printf("%d\\n", i);\n    return 0;\n}', a: 3,
+      why: "i-- makes i go 1, 0, -1 … so i <= 5 stays true and the loop never ends properly. The code is valid C; the logic is wrong. It should be i++." },
+    { task: "Print the bill total.", code: '#include <stdio.h>\n\nint main(void) {\n    int chai = 20, samosa = 15;\n    printf("Total = %d\\n", chai + samosa);\n    return 0;\n}', a: 4,
+      why: "Nothing is wrong. It prints Total = 35. Always check carefully before assuming there is a bug." },
+    { task: "Print how much the student paid.", code: '#include <stdio.h>\n\nint main(void) {\n    int paid = 50;\n    printf("Paid %d\\n", payd);\n    return 0;\n}', a: 0,
+      why: "payd was never declared (it should be paid). The compiler refuses with \"'payd' undeclared\", a compile-time error." },
+    { task: "Print 2 chai at 10 rupees each.", code: '#include <stdio.h>\n\nint main(void) {\n    int qty = 2, price = 10;\n    printf("Bill = %d\\n", qty + price);\n    return 0;\n}', a: 3,
+      why: "It prints 12 instead of 20. The bill should be qty * price." },
+    { task: "Find the remainder when a number is divided by the user's input.", code: '#include <stdio.h>\n\nint main(void) {\n    int n;\n    scanf("%d", &n);\n    printf("%d\\n", 25 % n);\n    return 0;\n}\n\n/* the user enters 0 */', a: 2,
+      why: "Taking a remainder with 0 (25 % 0) is like dividing by 0: it crashes while running." }
+  ];
+  var order = [], pos = 0, answered = false;
+  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = rand(0, i), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function newErr() {
+    if (pos >= order.length) { order = shuffle(BANK.map(function (_, i) { return i; })); pos = 0; }
+    var q = BANK[order[pos]]; answered = false;
+    $("err-count").textContent = "Program " + (pos + 1) + " of " + BANK.length;
+    $("err-task").textContent = "Goal: " + q.task;
+    $("err-code").innerHTML = esc(q.code);
+    var box = $("err-choices"); box.innerHTML = "";
+    KINDS.forEach(function (k, i) {
+      var b = document.createElement("button"); b.className = "choice"; b.textContent = k;
+      b.addEventListener("click", function () {
+        if (answered) return; answered = true; var ok = i === q.a;
+        box.querySelectorAll("button").forEach(function (x, j) { x.disabled = true;
+          if (j === q.a) x.classList.add("right"); else if (j === i) x.classList.add("wrong"); });
+        record("err", ok); feedback("err-fb", ok, ok ? "Correct: " + KINDS[q.a] + "." : (q.a === 4 ? "There is no error here." : "It's a " + KINDS[q.a].toLowerCase() + "."), q.why);
+      });
+      box.appendChild(b);
+    });
+    clearFb("err-fb"); pos++;
+  }
+  $("err-next").addEventListener("click", newErr);
+
+  /* ---------- trace the loop ---------- */
+  function gens() { return [
+    function () { var n = rand(3, 6), s = 0, rows = [];
+      for (var i = 1; i <= n; i++) { s += i; rows.push([i, s]); }
+      return { code: "int s = 0;\nfor (int i = 1; i <= " + n + "; i++) {\n    s = s + i;\n}", ask: "What is the value of s after the loop?", ans: s, cols: ["i", "s"], rows: rows }; },
+    function () { var n = rand(3, 5), p = 1, rows = [];
+      for (var i = 1; i <= n; i++) { p *= i; rows.push([i, p]); }
+      return { code: "int p = 1;\nfor (int i = 1; i <= " + n + "; i++) {\n    p = p * i;\n}", ask: "What is the value of p after the loop?", ans: p, cols: ["i", "p"], rows: rows }; },
+    function () { var n = rand(100, 99999), x = n, c = 0, rows = [];
+      while (x > 0) { c++; x = Math.floor(x / 10); rows.push([c, x]); }
+      return { code: "int n = " + n + ", count = 0;\nwhile (n > 0) {\n    count = count + 1;\n    n = n / 10;\n}", ask: "What is the value of count after the loop?", ans: c, cols: ["count", "n"], rows: rows }; },
+    function () { var a = rand(20, 40), k = rand(3, 7), b = rand(0, 8), x = a, rows = [];
+      while (x > b) { x -= k; rows.push([x]); }
+      return { code: "int x = " + a + ";\nwhile (x > " + b + ") {\n    x = x - " + k + ";\n}", ask: "What is the value of x after the loop?", ans: x, cols: ["x"], rows: rows }; },
+    function () { var n = rand(6, 12), s = 0, rows = [];
+      for (var i = 2; i <= n; i += 2) { s += i; rows.push([i, s]); }
+      return { code: "int s = 0;\nfor (int i = 2; i <= " + n + "; i = i + 2) {\n    s = s + i;\n}", ask: "What is the value of s after the loop?", ans: s, cols: ["i", "s"], rows: rows }; },
+    function () { var prices = [10, 15, 20, 30, 40], k = rand(3, 4), pick = shuffle(prices.slice()).slice(0, k), t = 0, rows = [];
+      pick.forEach(function (p, i) { t += p; rows.push([i, p, t]); });
+      return { code: "int prices[] = {" + pick.join(", ") + "};\nint total = 0;\nfor (int i = 0; i < " + k + "; i++) {\n    total = total + prices[i];\n}", ask: "What is the bill total after the loop?", ans: t, cols: ["i", "prices[i]", "total"], rows: rows }; }
+  ]; }
+  var T = null, tDone = false, last = -1;
+  function newTrc() {
+    var g = gens(), k; do { k = rand(0, g.length - 1); } while (k === last); last = k;
+    T = g[k](); tDone = false;
+    $("trc-code").innerHTML = esc(T.code); $("trc-ask").textContent = T.ask;
+    $("trc-input").value = ""; $("trc-check").disabled = false; clearFb("trc-fb");
+  }
+  $("trc-check").addEventListener("click", function () {
+    if (tDone) return; var v = $("trc-input").value.trim();
+    if (v === "") { feedback("trc-fb", false, "Type your answer first.", ""); return; }
+    tDone = true; $("trc-check").disabled = true; var ok = parseInt(v, 10) === T.ans; record("trc", ok);
+    var table = '<table class="trace"><tr>' + T.cols.map(function (c) { return "<th>" + esc(c) + "</th>"; }).join("") + "</tr>" +
+      T.rows.map(function (r) { return "<tr>" + r.map(function (c) { return "<td>" + c + "</td>"; }).join("") + "</tr>"; }).join("") + "</table>";
+    feedback("trc-fb", ok, ok ? "Correct: " + T.ans + "." : "The answer is " + T.ans + ".", "Here is the trace, one row per pass of the loop:" + table);
+  });
+  $("trc-next").addEventListener("click", newTrc);
+  $("trc-input").addEventListener("keydown", function (e) { if (e.key === "Enter") $("trc-check").click(); });
+
+
+  /* ---------- algorithms and flowcharts ---------- */
+  scores.alg = scores.alg || {r:0,t:0,s:0,best:0};
+  try { var sv = JSON.parse(localStorage.getItem("focp-m1-best") || "{}"); if (sv.alg) scores.alg.best = sv.alg; } catch (e) {}
+  showScore("alg");
+  var AM = "order";
+  var ORDER = [
+    { goal: "Find the average of three numbers.", steps: ["Read a, b and c", "sum = a + b + c", "avg = sum / 3", "Print avg"] },
+    { goal: "Swap the values of a and b.", steps: ["Read a and b", "temp = a", "a = b", "b = temp", "Print a and b"],
+      why: "temp must save a before a is overwritten, otherwise the old value of a is lost." },
+    { goal: "Check whether a number is even or odd.", steps: ["Read n", "If n % 2 == 0, print \"Even\"", "Otherwise, print \"Odd\""] },
+    { goal: "Print the canteen bill with 10% off above ₹200.", steps: ["Set total = 0", "For each item, add price × quantity to total", "If total > 200, take 10% off total", "Print total"] },
+    { goal: "Calculate the auto fare: ₹30 for the first 2 km, ₹15 per km after that.", steps: ["Read km", "If km <= 2, fare = 30", "Otherwise, fare = 30 + (km − 2) × 15", "Print fare"] },
+    { goal: "Withdraw cash from an ATM.", steps: ["Read the PIN", "If the PIN is wrong, print \"Wrong PIN\" and stop", "Read the amount", "If amount > balance, print \"Insufficient balance\"", "Otherwise, give the cash and reduce the balance"] },
+    { goal: "Add the numbers from 1 to n.", steps: ["Read n", "Set sum = 0 and i = 1", "While i <= n, add i to sum and increase i by 1", "Print sum"] }
+  ];
+  var SHAPES = {
+    "Terminal": '<svg viewBox="0 0 96 52"><rect x="4" y="8" width="88" height="36" rx="18" fill="#1F5FBF"/></svg>',
+    "Input / Output": '<svg viewBox="0 0 96 52"><path d="M20 8H92L76 44H4Z" fill="#F2A900"/></svg>',
+    "Process": '<svg viewBox="0 0 96 52"><rect x="8" y="8" width="80" height="36" fill="#14202E"/></svg>',
+    "Decision": '<svg viewBox="0 0 96 52"><path d="M48 3L92 26L48 49L4 26Z" fill="#B8332A"/></svg>'
+  };
+  var SNAMES = Object.keys(SHAPES);
+  var SYM = [
+    ["Start", 0, "Start and Stop go in the rounded terminal shape."], ["Stop", 0, "Start and Stop go in the rounded terminal shape."],
+    ["Read price", 1, "Reading input uses the parallelogram."], ["Print total", 1, "Printing output uses the parallelogram."],
+    ["Read km", 1, "Reading input uses the parallelogram."], ["Display \"Thank you\"", 1, "Showing output uses the parallelogram."],
+    ["total = total + price", 2, "A calculation or assignment is a process: the rectangle."], ["count = count + 1", 2, "An assignment is a process: the rectangle."],
+    ["fare = 30 + (km − 2) × 15", 2, "A calculation is a process: the rectangle."],
+    ["Is total > 200?", 3, "A yes/no question is a decision: the diamond, with two exits."], ["Is n % 2 == 0?", 3, "A yes/no question is a decision: the diamond."],
+    ["Is the PIN correct?", 3, "A yes/no question is a decision: the diamond."]
+  ];
+  var PROPS = ["Input", "Output", "Definiteness", "Finiteness", "Effectiveness"];
+  var FLAWS = [
+    ["Step 3: Keep adding 1 to x.", 3, "There is no condition to stop, so the algorithm never ends. It must be finite."],
+    ["Step 2: Add a few spoons of sugar.", 2, "\"A few\" is vague; two people would do different things. Every step must be definite."],
+    ["Step 4: Write down the last digit of π.", 4, "π never ends, so this step cannot actually be done. Every step must be effective."],
+    ["The algorithm calculates the average of the marks, then stops without printing or returning it.", 1, "An algorithm must produce at least one output."],
+    ["Step 2: Calculate the bill appropriately.", 2, "\"Appropriately\" doesn't say how. Each step must be clear and exact."],
+    ["Set i = 1. While i > 0, increase i by 1.", 3, "i only grows, so i > 0 is always true and the loop never ends."],
+    ["Step 2: Divide the total by the number of friends. (The number of friends is never read or given.)", 0, "The algorithm needs a value it never receives. It is missing an input."],
+    ["Step 1: Find the largest prime number.", 4, "There is no largest prime, so no one could ever carry out this step."]
+  ];
+  var cur = null, aDone = false, lastQ = {};
+  function pickNew(list, key) { var k; do { k = rand(0, list.length - 1); } while (list.length > 1 && k === lastQ[key]); lastQ[key] = k; return list[k]; }
+  function actions(btns) { var a = $("alg-actions"); a.innerHTML = ""; btns.forEach(function (b) { a.appendChild(b); }); }
+  function mk(label, cls, fn) { var b = document.createElement("button"); b.className = "btn " + cls; b.textContent = label; b.addEventListener("click", fn); return b; }
+  function finish(ok, title, body) { aDone = true; record("alg", ok); feedback("alg-fb", ok, title, body); }
+
+  function newOrder() {
+    var q = pickNew(ORDER, "order"), idx = q.steps.map(function (_, i) { return i; });
+    do { shuffle(idx); } while (idx.every(function (v, i) { return v === i; }));
+    var picked = []; aDone = false; clearFb("alg-fb");
+    var body = $("alg-body");
+    body.innerHTML = '<p class="prompt">Goal: ' + esc(q.goal) + '</p><p class="task">Tap the steps in the right order.</p>' +
+      '<div class="cols"><div><p class="h3">Steps</p><div class="steps" id="pool"></div></div>' +
+      '<div><p class="h3">Your algorithm</p><div class="fixed">Start</div><ol class="mine" id="mine"></ol><div class="fixed">Stop</div></div></div>';
+    var pool = $("pool"), mine = $("mine");
+    function draw() {
+      pool.innerHTML = ""; idx.forEach(function (i) { var b = document.createElement("button"); b.className = "step"; b.textContent = q.steps[i];
+        b.disabled = picked.indexOf(i) >= 0 || aDone; b.addEventListener("click", function () { picked.push(i); draw(); }); pool.appendChild(b); });
+      mine.innerHTML = picked.map(function (i, n) { var c = aDone ? (i === n ? ' class="right"' : ' class="wrong"') : ""; return "<li" + c + ">" + esc(q.steps[i]) + "</li>"; }).join("");
+    }
+    draw();
+    actions([
+      mk("Check", "primary", function () { if (aDone) return; if (picked.length < q.steps.length) { feedback("alg-fb", false, "Place every step first.", ""); return; }
+        var ok = picked.every(function (v, i) { return v === i; });
+        finish(ok, ok ? "Correct order." : "Not quite. The right order is:",
+          (ok ? "" : "<ol style='margin:6px 0 0;padding-left:22px'>" + q.steps.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + "</ol>") + (q.why ? esc(q.why) : "")); draw(); }),
+      mk("Undo", "ghost", function () { if (!aDone) { picked.pop(); draw(); } }),
+      mk("Next algorithm", "ghost", newOrder)
+    ]);
+  }
+
+  function newSymbol() {
+    var q = pickNew(SYM, "sym"); aDone = false; clearFb("alg-fb");
+    $("alg-body").innerHTML = '<p class="prompt">Which flowchart symbol does this step go in?</p><div class="statement">' + esc(q[0]) + '</div><div class="choices" id="sym-ch"></div>';
+    var box = $("sym-ch");
+    SNAMES.forEach(function (n, i) { var b = document.createElement("button"); b.className = "choice shape-choice"; b.innerHTML = SHAPES[n] + "<span>" + n + "</span>";
+      b.setAttribute("aria-label", n);
+      b.addEventListener("click", function () { if (aDone) return; var ok = i === q[1];
+        box.querySelectorAll("button").forEach(function (x, j) { x.disabled = true; if (j === q[1]) x.classList.add("right"); else if (j === i) x.classList.add("wrong"); });
+        finish(ok, ok ? "Correct: " + SNAMES[q[1]] + "." : "It's the " + SNAMES[q[1]].toLowerCase() + " symbol.", q[2]); });
+      box.appendChild(b); });
+    actions([mk("Next step", "ghost", newSymbol)]);
+  }
+
+  function pseudoGens() { return [
+    function () { var x = rand(20, 90); return { code: "x ← " + x + "\nIF x > 50 THEN\n    y ← x − 10\nELSE\n    y ← x + 10\nEND IF\nPRINT y", ans: x > 50 ? x - 10 : x + 10,
+      why: x + (x > 50 ? " > 50 is true, so y = " + x + " − 10." : " > 50 is false, so the ELSE part runs: y = " + x + " + 10.") }; },
+    function () { var a = rand(15, 40), k = rand(3, 7), n = a, c = 0; while (n > 0) { n -= k; c++; }
+      return { code: "n ← " + a + "\ncount ← 0\nWHILE n > 0 DO\n    n ← n − " + k + "\n    count ← count + 1\nEND WHILE\nPRINT count", ans: c,
+      why: "n goes down by " + k + " each pass until it is no longer above 0. That takes " + c + " passes." }; },
+    function () { var n = rand(10, 25), c = Math.floor(n / 3);
+      return { code: "c ← 0\nFOR i ← 1 TO " + n + " DO\n    IF i MOD 3 = 0 THEN\n        c ← c + 1\n    END IF\nEND FOR\nPRINT c", ans: c,
+      why: "It counts the multiples of 3 from 1 to " + n + ": there are " + c + "." }; },
+    function () { var a = rand(1, 50), b = rand(1, 50), c = rand(1, 50), m = Math.max(a, b, c);
+      return { code: "a ← " + a + ", b ← " + b + ", c ← " + c + "\nlargest ← a\nIF b > largest THEN largest ← b\nIF c > largest THEN largest ← c\nPRINT largest", ans: m,
+      why: "largest starts as " + a + " and is replaced whenever a bigger value appears. It ends as " + m + "." }; },
+    function () { var km = rand(1, 12), f = km <= 2 ? 30 : 30 + (km - 2) * 15;
+      return { code: "km ← " + km + "\nIF km <= 2 THEN\n    fare ← 30\nELSE\n    fare ← 30 + (km − 2) × 15\nEND IF\nPRINT fare", ans: f,
+      why: km <= 2 ? km + " km is 2 or less, so the fare is 30." : "30 + (" + km + " − 2) × 15 = " + f + "." }; },
+    function () { var t = rand(15, 30) * 10, f = t > 200 ? t - t / 10 : t;
+      return { code: "total ← " + t + "\nIF total > 200 THEN\n    total ← total − total / 10\nEND IF\nPRINT total", ans: f,
+      why: t > 200 ? t + " > 200, so 10% (" + t / 10 + ") is taken off." : t + " is not more than 200, so there is no discount." }; }
+  ]; }
+  function newPseudo() {
+    var g = pseudoGens(), q = pickNew(g, "ps")(); aDone = false; clearFb("alg-fb");
+    $("alg-body").innerHTML = '<p class="prompt">What does this pseudocode print?</p><pre><code>' + esc(q.code) + '</code></pre>' +
+      '<label for="ps-in" class="task">Your answer</label><br><input type="number" id="ps-in" inputmode="numeric">';
+    var check = function () { if (aDone) return; var v = $("ps-in").value.trim(); if (v === "") { feedback("alg-fb", false, "Type your answer first.", ""); return; }
+      var ok = parseFloat(v) === q.ans; finish(ok, ok ? "Correct: " + q.ans + "." : "It prints " + q.ans + ".", esc(q.why)); };
+    $("ps-in").addEventListener("keydown", function (e) { if (e.key === "Enter") check(); });
+    actions([mk("Check", "primary", check), mk("Next pseudocode", "ghost", newPseudo)]);
+  }
+
+  function newProp() {
+    var q = pickNew(FLAWS, "prop"); aDone = false; clearFb("alg-fb");
+    $("alg-body").innerHTML = '<p class="prompt">This algorithm is broken. Which property of a good algorithm does it break?</p><div class="statement" style="font-family:var(--sans);font-size:20px;font-weight:500">' + esc(q[0]) + '</div><div class="choices" id="pr-ch"></div>';
+    var box = $("pr-ch");
+    PROPS.forEach(function (p, i) { var b = document.createElement("button"); b.className = "choice"; b.textContent = p;
+      b.addEventListener("click", function () { if (aDone) return; var ok = i === q[1];
+        box.querySelectorAll("button").forEach(function (x, j) { x.disabled = true; if (j === q[1]) x.classList.add("right"); else if (j === i) x.classList.add("wrong"); });
+        finish(ok, ok ? "Correct: " + PROPS[q[1]] + "." : "It breaks " + PROPS[q[1]].toLowerCase() + ".", q[2]); });
+      box.appendChild(b); });
+    actions([mk("Next algorithm", "ghost", newProp)]);
+  }
+  var AMODES = { order: newOrder, symbol: newSymbol, pseudo: newPseudo, prop: newProp };
+  document.querySelectorAll("[data-am]").forEach(function (b) { b.addEventListener("click", function () {
+    AM = b.dataset.am; document.querySelectorAll("[data-am]").forEach(function (x) { x.setAttribute("aria-pressed", x === b); }); AMODES[AM](); }); });
+
+  /* ---------- ask the course assistant ---------- */
+  // Paste your NotebookLM (Gemini Notebook) chat-view link between the quotes.
+  var ASSISTANT_URL = "";
+  if (ASSISTANT_URL) { $("ask-link").href = ASSISTANT_URL; } else { $("ask-link").style.display = "none"; }
+  $("copy-q").addEventListener("click", function () {
+    var p = document.querySelector(".panel:not([hidden])");
+    var tab = document.querySelector('.tab[aria-selected="true"]').textContent;
+    var parts = ["FoCP Module 1 practice, " + tab + ":"];
+    p.querySelectorAll(".prompt, .target, .statement, pre, #pool, #mine").forEach(function (el) {
+      var t;
+      if (el.id === "pool") t = "Steps: " + Array.prototype.map.call(el.children, function (c) { return c.textContent; }).join(" | ");
+      else if (el.id === "mine") t = el.children.length ? "My order so far: " + Array.prototype.map.call(el.children, function (c) { return c.textContent; }).join(" | ") : "";
+      else t = (el.innerText || el.textContent).trim();
+      if (t) parts.push(el.tagName === "PRE" ? t : t.replace(/\n+/g, " ")); });
+    parts.push("I'm stuck. Please give me a hint, not the full answer.");
+    var text = parts.join("\n\n");
+    function done() { $("copied").textContent = "Copied"; setTimeout(function () { $("copied").textContent = ""; }, 2000); }
+    if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(text).then(done, fallback); } else { fallback(); }
+    function fallback() { var ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); done(); } catch (e) { $("copied").textContent = "Select and copy the question manually"; } document.body.removeChild(ta); }
+  });
+
+  newBin(); newErr(); newTrc(); newOrder();
+})();
+</script>
+</body>
+</html>
