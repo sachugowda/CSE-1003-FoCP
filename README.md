@@ -8,6 +8,35 @@ For each topic you'll find **📖 notes** to read, **🎥 videos** to watch, and
 
 ## Module 1: Fundamentals of Programming
 
+### ⭐ Start here
+
+| | What it is | Link |
+|---|---|---|
+| 📊 **Slides** | Class 1: Why learn the fundamentals in the AI era | [Open slides](https://github.com/sachugowda/CSE-1003-FoCP/tree/main/CS1) |
+| 📊 **Slides** | Module 1 recap: the canteen bill | [Open recap](https://github.com/sachugowda/CSE-1003-FoCP/tree/main/Module-1-Recap) |
+| 🧪 **Practice** | Binary switches, name the error, trace the loop, algorithms and flowcharts | [Module 1 practice](https://sachugowda.github.io/CSE-1003-FoCP/practice/module1-practice.html) |
+| 🤖 **Assistant** | Your Module 1 study partner: ask any doubt, get concepts explained simply, revise before exams, or get a hint when stuck on practice | [Module 1 assistant](https://notebook.google.com/notebook/d21e64a6-0d1c-4e65-ac2d-39fe2dfde9be) |
+
+**How to study:** go through the slides, then practise. Use the assistant any time you want to understand something better. For example:
+- "Explain the difference between a compiler and an interpreter with an example."
+- "Show me how to convert 45 to binary, step by step."
+- "Give me 5 questions to test myself on flowcharts."
+- Stuck on the practice page? Tap **Copy question** and paste it into the assistant for a hint.
+
+### ✍️ Exam-style questions
+
+The practice page checks quick answers. These questions practise what exams ask you to **write and draw**. Solve them on paper first.
+
+1. Convert 75 to binary, octal and hexadecimal.
+2. Write the word CHAI in ASCII codes, then in binary.
+3. Name the four types of errors in C and give one example of each.
+4. Write an algorithm and draw a flowchart to find the largest of three numbers. Test it with 3 equal numbers.
+5. An auto charges ₹30 for the first 2 km and ₹15 per km after that. Write the algorithm and pseudocode, and test it for 1 km, 2 km and 10 km.
+
+**Check your work:** type your answer into the assistant and ask *"Is my answer correct? What did I miss?"* For flowcharts, describe each box in order, or draw it in [draw.io](https://app.diagrams.net/) or [Flowgorithm](http://www.flowgorithm.org/).
+
+### 📚 Go deeper: additional resources by topic
+
 | # | Topic | 📖 Notes | 🎥 Watch | 🧪 Play area |
 |---|---|---|---|---|
 | 1 | Brief history of computing and computers | [History of Computers (GfG)](https://www.geeksforgeeks.org/computer-science-fundamentals/history-of-computers/) · [Generations of Computers (GfG)](https://www.geeksforgeeks.org/computer-science-fundamentals/generations-of-computers-computer-fundamentals/) | [Crash Course CS #1: Early Computing](https://www.youtube.com/watch?v=O5nskjZ_GoI) · [#2: Electronic Computing](https://www.youtube.com/watch?v=LN0ucKNX0hc) | — |
@@ -27,18 +56,6 @@ For each topic you'll find **📖 notes** to read, **🎥 videos** to watch, and
 
 ---
 
-## ✍️ Module 1 self-check
-
-Try these before the exam. Write the algorithm or working first, then check it with a tool from the play area.
-
-1. Convert **75** to binary, octal and hexadecimal.
-2. Write the word **CHAI** in ASCII codes, then in binary.
-3. Name the four types of errors in C and give one example of each.
-4. Write an algorithm and draw a flowchart to find the **largest of three numbers**. Test it with 3 equal numbers.
-5. An auto charges ₹30 for the first 2 km and ₹15 per km after that. Write the algorithm and pseudocode, and test it for 1 km, 2 km and 10 km.
-
----
-
 ## 📚 Full online courses (free)
 
 | Course | Why take it |
@@ -47,7 +64,7 @@ Try these before the exam. Write the algorithm or working first, then check it w
 | [NPTEL: The Joy of Computing using Python](https://nptel.ac.in/courses/106106182), Prof. Sudarshan Iyengar, IIT Ropar · *optional* | A fun, story-driven first course in computational thinking. It uses Python, not C, but the logic you learn carries over |
 | [Crash Course Computer Science](https://www.youtube.com/playlist?list=PL8dPuuaLjXtNlUrzyH5r6jN9ulIgZBpdo) | Short, visual videos on how computers work |
 
-> NPTEL lectures are free to watch any time. A certificate is optional
+> NPTEL lectures are free to watch any time.
 
 ---
 
