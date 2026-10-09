@@ -1,7 +1,9 @@
 # CSE-1003 · FoCP
 **Fundamentals of Computer Programming**
-
+ 
 Course resources for B.Tech first-year students, IIIT Bhopal.
+**Instructor:** Dr Sachin D N, Assistant Professor, Department of CSE, IIIT Bhopal · [sachin.dn@iiitbhopal.ac.in](mailto:sachin.dn@iiitbhopal.ac.in)
+ 
 For each topic you'll find **📖 notes** to read, **🎥 videos** to watch, and a **🧪 play area** to try things yourself.
 
 ---
