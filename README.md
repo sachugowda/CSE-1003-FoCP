@@ -6,8 +6,9 @@ Course resources for B.Tech first-year students, IIIT Bhopal.
 **Instructor:** Dr Sachin D N, Assistant Professor, Department of CSE, IIIT Bhopal<br>
 📧 [sachin.dn@iiitbhopal.ac.in](mailto:sachin.dn@iiitbhopal.ac.in)
  
-### 🌐 Course website: <https://sachugowda.github.io/CSE-1003-FoCP/>
+🌐 **Course website:** <https://sachugowda.github.io/CSE-1003-FoCP/><br>
 Slides, practice, the course assistant and resources for every module in one place. Works best on phones.
+
 ---
 
 ## Module 1: Fundamentals of Programming
