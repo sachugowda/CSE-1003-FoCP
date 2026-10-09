@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSE-1003 Fundamentals of Computer Programming · IIIT Bhopal</title>
+<meta name="description" content="Course page for CSE-1003 Fundamentals of Computer Programming, IIIT Bhopal: slides, practice, course assistant and resources for each module.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bench: #EEF1F4; --panel: #FFFFFF; --line: #D3DAE3; --ink: #14202E; --muted: #5A6778;
+    --signal: #F2A900; --wire: #1F5FBF; --wire-soft: #E4ECF8;
+    --sans: "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+    --mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bench); color: var(--ink); font-family: var(--sans); font-size: 17px; line-height: 1.55; }
+  a { color: var(--wire); }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 36px 20px 64px; }
+
+  header { padding-bottom: 24px; border-bottom: 2px solid var(--line); }
+  .code { font: 600 15px var(--mono); color: var(--muted); letter-spacing: .5px; }
+  h1 { font-size: 36px; line-height: 1.15; margin: 6px 0 10px; }
+  header p { margin: 0; color: var(--muted); max-width: 640px; }
+
+  h2 { font-size: 24px; margin: 40px 0 14px; }
+  h3 { font-size: 19px; margin: 28px 0 10px; }
+
+  .module { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 26px 24px; margin-top: 18px; }
+  .module-head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  .module-head .num { font: 600 15px var(--mono); color: #fff; background: var(--ink); border-radius: 6px; padding: 2px 9px; }
+  .module-head h2 { margin: 0; font-size: 24px; }
+
+  .start { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-top: 18px; }
+  .tile { display: flex; flex-direction: column; gap: 6px; padding: 16px 16px 18px; border: 2px solid var(--line); border-radius: 10px;
+          text-decoration: none; color: var(--ink); background: var(--panel); transition: border-color .15s ease, transform .15s ease; }
+  .tile:hover { border-color: var(--wire); transform: translateY(-2px); }
+  .tile .kind { font: 600 13px var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .tile strong { font-size: 17px; line-height: 1.3; }
+  .tile span.desc { font-size: 14.5px; color: var(--muted); }
+  .tile.key { border-color: var(--ink); }
+  .tile.key .kind { color: var(--ink); }
+  .tile .go { margin-top: auto; padding-top: 6px; font-weight: 600; color: var(--wire); font-size: 15px; }
+
+  .how { background: var(--wire-soft); border-radius: 10px; padding: 14px 18px; margin-top: 16px; font-size: 16px; }
+  .how ul { margin: 6px 0 0; padding-left: 20px; }
+  .how li { margin: 3px 0; }
+
+  ol.exam li { margin: 6px 0; }
+
+  details.topic { border-top: 1px solid var(--line); }
+  details.topic:last-of-type { border-bottom: 1px solid var(--line); }
+  details.topic summary { cursor: pointer; padding: 11px 4px; font-weight: 600; list-style: none; display: flex; gap: 12px; align-items: baseline; }
+  details.topic summary::-webkit-details-marker { display: none; }
+  details.topic summary .n { font: 500 14px var(--mono); color: var(--muted); min-width: 22px; }
+  details.topic summary::after { content: "+"; margin-left: auto; font: 600 18px var(--mono); color: var(--muted); }
+  details.topic[open] summary::after { content: "−"; }
+  .res { display: grid; grid-template-columns: 90px 1fr; gap: 6px 14px; padding: 0 4px 14px 38px; font-size: 15.5px; }
+  .res dt { color: var(--muted); font-weight: 600; }
+  .res dd { margin: 0; }
+
+  .later { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+  .later li { background: var(--panel); border: 1px dashed var(--line); border-radius: 10px; padding: 12px 14px; color: var(--muted); }
+  .later b { color: var(--ink); font-weight: 600; }
+
+  table { border-collapse: collapse; width: 100%; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; font-size: 15.5px; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { background: var(--bench); font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+  .table-wrap { overflow-x: auto; }
+
+  footer { margin-top: 44px; font-size: 14px; color: var(--muted); }
+  a:focus-visible, summary:focus-visible { outline: 3px solid var(--wire); outline-offset: 2px; border-radius: 4px; }
+  @media (max-width: 560px) { h1 { font-size: 29px; } .module { padding: 20px 16px; } .res { grid-template-columns: 1fr; padding-left: 4px; } }
+  @media (prefers-reduced-motion: reduce) { .tile { transition: none; } .tile:hover { transform: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="code">CSE-1003 · IIIT Bhopal</div>
+    <h1>Fundamentals of Computer Programming</h1>
+    <p>Everything for this course in one place: slides, practice, a course assistant for your doubts, and extra resources for each module.</p>
+  </header>
+
+  <!-- MODULE 1 -->
+  <section class="module" id="module-1">
+    <div class="module-head"><span class="num">M1</span><h2>Fundamentals of Programming</h2></div>
+
+    <h3>Start here</h3>
+    <div class="start">
+      <a class="tile" href="https://github.com/sachugowda/CSE-1003-FoCP/tree/main/CS1" target="_blank" rel="noopener">
+        <span class="kind">Slides</span><strong>Class 1: Why learn the fundamentals</strong><span class="desc">Programming basics in the AI era</span><span class="go">Open slides ↗</span></a>
+      <a class="tile" href="https://github.com/sachugowda/CSE-1003-FoCP/tree/main/Module-1-Recap" target="_blank" rel="noopener">
+        <span class="kind">Slides</span><strong>Module 1 recap</strong><span class="desc">The whole module through one canteen bill</span><span class="go">Open recap ↗</span></a>
+      <a class="tile key" href="https://sachugowda.github.io/CSE-1003-FoCP/practice/module1-practice.html" target="_blank" rel="noopener">
+        <span class="kind">Practice</span><strong>Module 1 practice</strong><span class="desc">Binary, errors, loop tracing, algorithms and flowcharts</span><span class="go">Start practising ↗</span></a>
+      <a class="tile key" href="https://notebook.google.com/notebook/d21e64a6-0d1c-4e65-ac2d-39fe2dfde9be" target="_blank" rel="noopener">
+        <span class="kind">Assistant</span><strong>Module 1 assistant</strong><span class="desc">Ask any doubt, revise, or get a hint</span><span class="go">Ask a question ↗</span></a>
+    </div>
+
+    <div class="how">
+      <b>How to study:</b> go through the slides, then practise. Use the assistant any time you want to understand something better, for example:
+      <ul>
+        <li>"Explain the difference between a compiler and an interpreter with an example."</li>
+        <li>"Show me how to convert 45 to binary, step by step."</li>
+        <li>"Give me 5 questions to test myself on flowcharts."</li>
+        <li>Stuck on the practice page? Tap <b>Copy question</b> and paste it into the assistant for a hint.</li>
+      </ul>
+    </div>
+
+    <h3>Exam-style questions</h3>
+    <p style="margin:0 0 6px">The practice page checks quick answers. These practise what exams ask you to <b>write and draw</b>. Solve them on paper first.</p>
+    <ol class="exam">
+      <li>Convert 75 to binary, octal and hexadecimal.</li>
+      <li>Write the word CHAI in ASCII codes, then in binary.</li>
+      <li>Name the four types of errors in C and give one example of each.</li>
+      <li>Write an algorithm and draw a flowchart to find the largest of three numbers. Test it with 3 equal numbers.</li>
+      <li>An auto charges ₹30 for the first 2 km and ₹15 per km after that. Write the algorithm and pseudocode, and test it for 1 km, 2 km and 10 km.</li>
+    </ol>
+    <p style="font-size:15.5px;color:var(--muted)"><b style="color:var(--ink)">Check your work:</b> type your answer into the assistant and ask "Is my answer correct? What did I miss?" Draw flowcharts in <a href="https://app.diagrams.net/" target="_blank" rel="noopener">draw.io</a> or <a href="http://www.flowgorithm.org/" target="_blank" rel="noopener">Flowgorithm</a>.</p>
+
+    <h3>Go deeper: resources by topic</h3>
+    <div id="topics"></div>
+  </section>
+
+  <h2>Coming next</h2>
+  <ul class="later">
+    <li><b>Module 2</b><br>Basic Programming and Control Statements</li>
+    <li><b>Module 3</b><br>Functions and Recursion</li>
+    <li><b>Module 4</b><br>Arrays and Strings</li>
+    <li><b>Module 5</b><br>Pointers, Dynamic Memory and Structures</li>
+    <li><b>Module 6</b><br>Files in C</li>
+  </ul>
+
+  <h2>Full online courses (free)</h2>
+  <div class="table-wrap"><table>
+    <tr><th>Course</th><th>Why take it</th></tr>
+    <tr><td><a href="https://nptel.ac.in/courses/106105171" target="_blank" rel="noopener">NPTEL: Problem Solving through Programming in C</a><br><span style="color:var(--muted)">Prof. Anupam Basu, IIT Kharagpur</span></td><td>Follows this course's syllabus closely; great for revision</td></tr>
+    <tr><td><a href="https://nptel.ac.in/courses/106106182" target="_blank" rel="noopener">NPTEL: The Joy of Computing using Python</a><br><span style="color:var(--muted)">Prof. Sudarshan Iyengar, IIT Ropar · optional</span></td><td>A fun, story-driven first course in computational thinking. It uses Python, but the logic carries over</td></tr>
+    <tr><td><a href="https://www.youtube.com/playlist?list=PL8dPuuaLjXtNlUrzyH5r6jN9ulIgZBpdo" target="_blank" rel="noopener">Crash Course Computer Science</a></td><td>Short, visual videos on how computers work</td></tr>
+  </table></div>
+  <p style="font-size:15px;color:var(--muted)">NPTEL lectures are free to watch any time.</p>
+
+  <footer>CSE-1003 Fundamentals of Computer Programming, Department of CSE, IIIT Bhopal. Links checked October 2026.</footer>
+</div>
+
+<script>
+  /* Module 1 topics: [topic, notes[], videos[], play[]]; each link is [label, url] */
+  var GFG = "https://www.geeksforgeeks.org/", CC = "https://www.youtube.com/watch?v=", NPTEL = "https://nptel.ac.in/courses/106105171";
+  var TOPICS = [
+    ["Brief history of computing and computers",
+      [["History of Computers (GfG)", GFG + "computer-science-fundamentals/history-of-computers/"], ["Generations of Computers (GfG)", GFG + "computer-science-fundamentals/generations-of-computers-computer-fundamentals/"]],
+      [["Crash Course CS #1: Early Computing", CC + "O5nskjZ_GoI"], ["Crash Course CS #2: Electronic Computing", CC + "LN0ucKNX0hc"]], []],
+    ["Basic organisation of a computer",
+      [["Block Diagram of a Computer", "https://artoftesting.com/block-diagram-of-computer"]],
+      [["Crash Course CS #7: The Central Processing Unit", CC + "FZGugFqdr60"]], []],
+    ["Representing information as bit patterns",
+      [["ASCII table", "https://www.asciitable.com/"]],
+      [["Crash Course CS #4: Representing Numbers and Letters with Binary", CC + "1GSjbWt0c9M"]],
+      [["CS Unplugged: Binary Numbers", "https://classic.csunplugged.org/binary-numbers/"]]],
+    ["Number systems",
+      [["Base Conversions for Number Systems (GfG)", GFG + "digital-logic/number-system-and-base-conversions/"]],
+      [["Crash Course CS #4", CC + "1GSjbWt0c9M"]],
+      [["Cisco Binary Game (free sign-up)", "https://learningnetwork.cisco.com/s/binary-game"]]],
+    ["Basics of computer languages",
+      [["Language Processors: Assembler, Compiler, Interpreter (GfG)", GFG + "computer-science-fundamentals/language-processors-assembler-compiler-and-interpreter/"]],
+      [["Crash Course CS #11: The First Programming Languages", CC + "RU1u-js7db8"]],
+      [["Compiler Explorer: see your C turn into assembly", "https://godbolt.org/"]]],
+    ["Generations of programming languages",
+      [["Generations of Programming Languages (GfG)", GFG + "blogs/generation-programming-languages/"]],
+      [["Crash Course CS #11", CC + "RU1u-js7db8"]], []],
+    ["Compilers",
+      [["Compiler vs Interpreter (GfG)", GFG + "compiler-design/difference-between-compiler-and-interpreter/"]],
+      [["NPTEL: Problem Solving through Programming in C, Week 1", NPTEL]],
+      [["Compiler Explorer", "https://godbolt.org/"]]],
+    ["Interpreters",
+      [["Compiled vs Interpreted Languages (GfG)", GFG + "compiler-design/compiler-vs-interpreter-2/"]],
+      [["NPTEL Week 1", NPTEL]], []],
+    ["Programming environments",
+      [["W3Schools: C Get Started", "https://www.w3schools.com/c/c_getstarted.php"]],
+      [["NPTEL Week 1", NPTEL]],
+      [["W3Schools C editor", "https://www.w3schools.com/c/c_compiler.php"], ["OnlineGDB", "https://www.onlinegdb.com/"]]],
+    ["Types of errors and debugging techniques",
+      [["Errors in C/C++ (GfG)", GFG + "cpp/errors-in-cc/"]],
+      [["NPTEL Week 1: syntax and semantic errors", NPTEL]],
+      [["OnlineGDB (use Debug)", "https://www.onlinegdb.com/"], ["Python Tutor for C", "https://pythontutor.com/c.html"]]],
+    ["Problem-solving aspects",
+      [["Algorithm vs Pseudocode vs Program (GfG)", GFG + "dsa/difference-between-algorithm-pseudocode-and-program/"]],
+      [["Crash Course CS #12: Programming Basics", CC + "l26oaHV7D40"]], []],
+    ["Introduction to algorithms",
+      [["Algorithm vs Pseudocode vs Program (GfG)", GFG + "dsa/difference-between-algorithm-pseudocode-and-program/"]],
+      [["Crash Course CS #13: Intro to Algorithms", CC + "rL8X2mlNHPM"]],
+      [["Python Tutor for C", "https://pythontutor.com/c.html"]]],
+    ["Flowcharts",
+      [["Algorithm vs Flowchart (GfG)", GFG + "dsa/difference-between-algorithm-and-flowchart/"]],
+      [["NPTEL Week 1: flowcharts", NPTEL]],
+      [["Flowgorithm (runs your flowchart, Windows)", "http://www.flowgorithm.org/"], ["draw.io", "https://app.diagrams.net/"]]],
+    ["Pseudocode",
+      [["What is Pseudocode (GfG)", GFG + "dsa/what-is-pseudocode-a-complete-tutorial/"]],
+      [["NPTEL Week 1: pseudocode", NPTEL]],
+      [["Flowgorithm: shows the code for your flowchart", "http://www.flowgorithm.org/"]]]
+  ];
+  function links(list) {
+    return list.length ? list.map(function (l) { return '<a href="' + l[1] + '" target="_blank" rel="noopener">' + l[0] + "</a>"; }).join(" · ") : "—";
+  }
+  document.getElementById("topics").innerHTML = TOPICS.map(function (t, i) {
+    var rows = '<dt>Read</dt><dd>' + links(t[1]) + '</dd><dt>Watch</dt><dd>' + links(t[2]) + '</dd>' +
+               (t[3].length ? '<dt>Try</dt><dd>' + links(t[3]) + '</dd>' : '');
+    return '<details class="topic"><summary><span class="n">' + (i + 1) + '</span>' + t[0] + '</summary><dl class="res">' + rows + '</dl></details>';
+  }).join("");
+</script>
+</body>
+</html>
