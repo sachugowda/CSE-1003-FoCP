@@ -20,7 +20,7 @@
   a { color: var(--wire); }
   .wrap { max-width: 880px; margin: 0 auto; padding: 36px 20px 64px; }
 
-  header { padding-bottom: 24px; border-bottom: 2px solid var(--line); }
+  header { padding-bottom: 8px; }
   .code { font: 600 15px var(--mono); color: var(--muted); letter-spacing: .5px; }
   h1 { font-size: 36px; line-height: 1.15; margin: 6px 0 10px; }
   header p { margin: 0; color: var(--muted); max-width: 640px; }
@@ -72,6 +72,25 @@
   tr:last-child td { border-bottom: none; }
   .table-wrap { overflow-x: auto; }
 
+
+  .mtabs { display: flex; gap: 10px; margin-top: 22px; padding: 12px 0 14px; overflow-x: auto; position: sticky; top: 0; z-index: 5;
+           background: var(--bench); border-bottom: 1px solid var(--line); scrollbar-width: none; }
+  .mtabs::-webkit-scrollbar { display: none; }
+  .mtab { flex: 0 0 auto; display: flex; align-items: center; gap: 12px; padding: 8px 18px 8px 8px; border: 2px solid var(--line);
+          border-radius: 999px; background: var(--panel); color: var(--ink); cursor: pointer; text-align: left; font: 600 16px var(--sans);
+          transition: border-color .15s ease, background .15s ease; }
+  .mtab:hover { border-color: var(--wire); }
+  .mtab .badge { width: 38px; height: 38px; border-radius: 19px; background: var(--bench); color: var(--ink); display: flex; align-items: center;
+                 justify-content: center; font: 600 15px var(--mono); flex: none; }
+  .mtab .txt { display: flex; flex-direction: column; line-height: 1.2; }
+  .mtab .txt small { font-weight: 400; font-size: 13px; color: var(--muted); }
+  .mtab.later { border-style: dashed; }
+  .mtab[aria-selected="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .mtab[aria-selected="true"] .badge { background: var(--signal); color: var(--ink); }
+  .mtab[aria-selected="true"] .txt small { color: #C9D2DD; }
+  .mtab:focus-visible { outline: 3px solid var(--wire); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { .mtab { transition: none; } }
+  .panel[hidden] { display: none; }
   footer { margin-top: 44px; font-size: 14px; color: var(--muted); }
   a:focus-visible, summary:focus-visible { outline: 3px solid var(--wire); outline-offset: 2px; border-radius: 4px; }
   @media (max-width: 560px) { h1 { font-size: 29px; } .module { padding: 20px 16px; } .res { grid-template-columns: 1fr; padding-left: 4px; } }
@@ -88,8 +107,14 @@
     <p class="instructor"><b>Instructor:</b> Dr Sachin D N, Assistant Professor, Department of CSE, IIIT Bhopal · <a href="mailto:sachin.dn@iiitbhopal.ac.in">sachin.dn@iiitbhopal.ac.in</a></p>
   </header>
 
+  <nav class="mtabs" role="tablist" aria-label="Course modules">
+    <button class="mtab" role="tab" aria-selected="false" aria-controls="module-1" id="tab-module-1"><span class="badge">M1</span><span class="txt">Fundamentals<small>Module 1</small></span></button>
+    <button class="mtab" role="tab" aria-selected="true" aria-controls="module-2" id="tab-module-2"><span class="badge">M2</span><span class="txt">Control statements<small>Module 2</small></span></button>
+    <button class="mtab later" role="tab" aria-selected="false" aria-controls="more" id="tab-more"><span class="badge">3–6</span><span class="txt">Coming next<small>Modules 3 to 6</small></span></button>
+  </nav>
+
   <!-- MODULE 1 -->
-  <section class="module" id="module-1">
+  <section class="module panel" id="module-1" role="tabpanel" aria-labelledby="tab-module-1">
     <div class="module-head"><span class="num">M1</span><h2>Fundamentals of Programming</h2></div>
 
     <h3>Start here</h3>
@@ -99,7 +124,7 @@
       <a class="tile" href="https://github.com/sachugowda/CSE-1003-FoCP/tree/main/Module-1-Recap" target="_blank" rel="noopener">
         <span class="kind">Slides</span><strong>Module 1 recap</strong><span class="desc">The whole module through one canteen bill</span><span class="go">Open recap ↗</span></a>
       <a class="tile key" href="https://sachugowda.github.io/CSE-1003-FoCP/practice/module1-practice.html" target="_blank" rel="noopener">
-        <span class="kind">Practice</span><strong>Module 1 practice</strong><span class="desc">Binary, errors, loop tracing, algorithms and flowcharts</span><span class="go">Start practising ↗</span></a>
+        <span class="kind">Play</span><strong>Play with Concepts</strong><span class="desc">Binary, errors, loop tracing, algorithms and flowcharts</span><span class="go">Start playing ↗</span></a>
       <a class="tile key" href="https://notebook.google.com/notebook/d21e64a6-0d1c-4e65-ac2d-39fe2dfde9be" target="_blank" rel="noopener">
         <span class="kind">Assistant</span><strong>Module 1 assistant</strong><span class="desc">Ask any doubt, revise, or get a hint</span><span class="go">Ask a question ↗</span></a>
     </div>
@@ -110,12 +135,12 @@
         <li>"Explain the difference between a compiler and an interpreter with an example."</li>
         <li>"Show me how to convert 45 to binary, step by step."</li>
         <li>"Give me 5 questions to test myself on flowcharts."</li>
-        <li>Stuck on the practice page? Tap <b>Copy question</b> and paste it into the assistant for a hint.</li>
+        <li>Stuck in Play with Concepts? Tap <b>Copy question</b> and paste it into the assistant for a hint.</li>
       </ul>
     </div>
 
     <h3>Exam-style questions</h3>
-    <p style="margin:0 0 6px">The practice page checks quick answers. These practise what exams ask you to <b>write and draw</b>. Solve them on paper first.</p>
+    <p style="margin:0 0 6px">Play with Concepts checks quick answers. These practise what exams ask you to <b>write and draw</b>. Solve them on paper first.</p>
     <ol class="exam">
       <li>Convert 75 to binary, octal and hexadecimal.</li>
       <li>Write the word CHAI in ASCII codes, then in binary.</li>
@@ -129,15 +154,34 @@
     <div id="topics"></div>
   </section>
 
+  <!-- MODULE 2 -->
+  <section class="module panel" id="module-2" role="tabpanel" aria-labelledby="tab-module-2">
+    <div class="module-head"><span class="num">M2</span><h2>Basic Programming and Control Statements</h2></div>
+    <h3>Start here</h3>
+    <div class="start"><a class="tile" href="https://github.com/sachugowda/CSE-1003-FoCP/blob/main/Module-2/class1/FoCP%20Module%202%20%C2%B7%20Class%201%20%E2%80%94%20From%20Code%20to%20Program.pdf" target="_blank" rel="noopener"><span class="kind">Slides</span><strong>Class 1: From Code to Program</strong><span class="desc">Structure of a C program, life cycle, keywords, identifiers, data types, variables, constants, input/output</span><span class="go">Open slides ↗</span></a><a class="tile" href="https://github.com/sachugowda/CSE-1003-FoCP/blob/main/Module-2/class2/FoCP%20Module%202%20%C2%B7%20Class%202%20%E2%80%94%20Calculate%20and%20Decide.pdf" target="_blank" rel="noopener"><span class="kind">Slides</span><strong>Class 2: Calculate and Decide</strong><span class="desc">Operators, type conversion and type casting, conditional branching (if, else-if, switch)</span><span class="go">Open slides ↗</span></a><a class="tile" href="https://github.com/sachugowda/CSE-1003-FoCP/blob/main/Module-2/class3/FoCP%20Module%202%20%C2%B7%20Class%203%20%E2%80%94%20Repeat%20Until%20Done.pdf" target="_blank" rel="noopener"><span class="kind">Slides</span><strong>Class 3: Repeat Until Done</strong><span class="desc">Iterative statements (while, for, do-while), nested loops, break and continue</span><span class="go">Open slides ↗</span></a>
+      <a class="tile key" href="https://sachugowda.github.io/CSE-1003-FoCP/practice/module2-playground.html" target="_blank" rel="noopener"><span class="kind">Play</span><strong>Play with Concepts</strong><span class="desc">Predict it, run it, break it, fix it</span><span class="go">Start playing ↗</span></a>
+      <div class="tile" style="border-style:dashed"><span class="kind">Assistant</span><strong>Module 2 assistant</strong><span class="desc">Coming soon</span></div>
+    </div>
+    <div class="how"><b>How to study:</b> go through each class&#39;s slides, play with the concepts, then run its programs below. Type the input in OnlineGDB&#39;s input box before pressing Run.</div>
+    <h3>Run, read and watch: class by class</h3>
+    <div><details class="topic"><summary><span class="n">1</span>Class 1: From Code to Program</summary><dl class="res"><dt>Run</dt><dd><a href="https://www.onlinegdb.com/r0IkkMjzI" target="_blank" rel="noopener">bill.c</a> <span style="color:var(--muted)">(Canteen bill)</span> · <a href="https://onlinegdb.com/sio4ZG1L6" target="_blank" rel="noopener">bill_blanks.c</a> <span style="color:var(--muted)">(Fill in the blanks)</span> · <a href="https://onlinegdb.com/rVU0IAlIQ" target="_blank" rel="noopener">task1_broken.c</a> <span style="color:var(--muted)">(Fix 3 bugs)</span></dd><dt>Code</dt><dd><a href="https://github.com/sachugowda/CSE-1003-FoCP/tree/main/Module-2/class1" target="_blank" rel="noopener">All code for this class</a></dd><dt>Read</dt><dd><a href="https://www.w3schools.com/c/c_syntax.php" target="_blank" rel="noopener">C Syntax</a> · <a href="https://www.w3schools.com/c/c_output.php" target="_blank" rel="noopener">Output</a> · <a href="https://www.w3schools.com/c/c_variables.php" target="_blank" rel="noopener">Variables</a> · <a href="https://www.w3schools.com/c/c_data_types.php" target="_blank" rel="noopener">Data Types</a> · <a href="https://www.w3schools.com/c/c_constants.php" target="_blank" rel="noopener">Constants</a> · <a href="https://www.w3schools.com/c/c_user_input.php" target="_blank" rel="noopener">User Input</a></dd><dt>Watch</dt><dd><a href="https://nptel.ac.in/courses/106105171" target="_blank" rel="noopener">NPTEL: Problem Solving through Programming in C</a></dd></dl></details><details class="topic"><summary><span class="n">2</span>Class 2: Calculate and Decide</summary><dl class="res"><dt>Run</dt><dd><a href="https://onlinegdb.com/v5nx6m5Pa" target="_blank" rel="noopener">ops_blanks.c</a> <span style="color:var(--muted)">(Operators fill-in)</span> · <a href="https://onlinegdb.com/QD8AGNrgP" target="_blank" rel="noopener">tc_blanks.c</a> <span style="color:var(--muted)">(Type conversion fill-in)</span> · <a href="https://onlinegdb.com/rUwfGyteW" target="_blank" rel="noopener">bill2.c</a> <span style="color:var(--muted)">(Bill with discount)</span> · <a href="https://onlinegdb.com/vytRSpLVMZ" target="_blank" rel="noopener">menu.c</a> <span style="color:var(--muted)">(switch menu)</span> · <a href="https://onlinegdb.com/VRSF3kAW4" target="_blank" rel="noopener">bill2_blanks.c</a> <span style="color:var(--muted)">(Final fill-in)</span></dd><dt>Code</dt><dd><a href="https://github.com/sachugowda/CSE-1003-FoCP/tree/main/Module-2/class2/code" target="_blank" rel="noopener">All code for this class</a></dd><dt>Read</dt><dd><a href="https://www.w3schools.com/c/c_operators.php" target="_blank" rel="noopener">Operators</a> · <a href="https://www.w3schools.com/c/c_type_conversion.php" target="_blank" rel="noopener">Type Conversion</a> · <a href="https://www.w3schools.com/c/c_conditions.php" target="_blank" rel="noopener">If...Else</a> · <a href="https://www.w3schools.com/c/c_switch.php" target="_blank" rel="noopener">Switch</a></dd><dt>Watch</dt><dd><a href="https://nptel.ac.in/courses/106105171" target="_blank" rel="noopener">NPTEL: Problem Solving through Programming in C</a></dd></dl></details><details class="topic"><summary><span class="n">3</span>Class 3: Repeat Until Done</summary><dl class="res"><dt>Run</dt><dd><a href="https://onlinegdb.com/zF1-YZZV3" target="_blank" rel="noopener">collatz.c</a> <span style="color:var(--muted)">(3n + 1 puzzle)</span> · <a href="https://onlinegdb.com/XTp09_nnB" target="_blank" rel="noopener">miss_sum.c</a> <span style="color:var(--muted)">(Missing line)</span> · <a href="https://onlinegdb.com/mO4omS1u2" target="_blank" rel="noopener">miss_pattern.c</a> <span style="color:var(--muted)">(Missing line)</span> · <a href="https://onlinegdb.com/aAWDAk8fH" target="_blank" rel="noopener">broken_table.c</a> <span style="color:var(--muted)">(Fix 3 bugs)</span> · <a href="https://onlinegdb.com/fEd5M0-HI" target="_blank" rel="noopener">canteen3.c</a> <span style="color:var(--muted)">(Canteen counter)</span> · <a href="https://onlinegdb.com/_zOm6Xm2Y" target="_blank" rel="noopener">seats.c</a> <span style="color:var(--muted)">(Cinema seats)</span> · <a href="https://onlinegdb.com/oG63uc1EI" target="_blank" rel="noopener">canteen3_missing.c</a> <span style="color:var(--muted)">(3 missing lines)</span> · <a href="https://onlinegdb.com/DVDy76PPW" target="_blank" rel="noopener">grains.c</a> <span style="color:var(--muted)">(Chessboard puzzle)</span></dd><dt>Code</dt><dd><a href="https://github.com/sachugowda/CSE-1003-FoCP/tree/main/Module-2/class3/code" target="_blank" rel="noopener">All code for this class</a></dd><dt>Read</dt><dd><a href="https://www.w3schools.com/c/c_while_loop.php" target="_blank" rel="noopener">While Loop</a> · <a href="https://www.w3schools.com/c/c_for_loop.php" target="_blank" rel="noopener">For Loop</a> · <a href="https://www.w3schools.com/c/c_break_continue.php" target="_blank" rel="noopener">Break/Continue</a></dd><dt>Watch</dt><dd><a href="https://nptel.ac.in/courses/106105171" target="_blank" rel="noopener">NPTEL: Problem Solving through Programming in C</a></dd></dl></details></div>
+    <h3>Exam-style questions</h3>
+    <ol class="exam"><li>Write a C program to read marks in 3 subjects and print the total and the average with 2 decimal places. Explain why <code>(float)</code> is needed.</li><li>What do <code>7 / 2</code>, <code>7 % 2</code>, <code>7 / 2.0</code> and <code>(float)(7 / 2)</code> give? Explain each answer.</li><li>Write a program using <code>switch</code> for a canteen menu: 1 Chai ₹10, 2 Samosa ₹15, 3 Maggi ₹40, anything else prints "No such item". What happens if one <code>break</code> is missing?</li><li>Write a program to print the multiplication table of a number using a <code>for</code> loop. Rewrite it using <code>while</code>.</li><li>Print a star triangle with n rows using nested loops. Explain the difference between <code>break</code> and <code>continue</code> with one example each.</li></ol>
+    <p style="font-size:15.5px;color:var(--muted)"><b style="color:var(--ink)">Check your work:</b> run your program with two or three different inputs, including a boundary value.</p>
+  </section>
+
+  <div class="panel" id="more" role="tabpanel" aria-labelledby="tab-more">
   <h2>Coming next</h2>
   <ul class="later">
-    <li><b>Module 2</b><br>Basic Programming and Control Statements</li>
     <li><b>Module 3</b><br>Functions and Recursion</li>
     <li><b>Module 4</b><br>Arrays and Strings</li>
     <li><b>Module 5</b><br>Pointers, Dynamic Memory and Structures</li>
     <li><b>Module 6</b><br>Files in C</li>
   </ul>
 
+
+  </div>
+  <div style="border-top:2px solid var(--line);margin-top:44px">
   <h2>Full online courses (free)</h2>
   <div class="table-wrap"><table>
     <tr><th>Course</th><th>Why take it</th></tr>
@@ -146,7 +190,7 @@
     <tr><td><a href="https://www.youtube.com/playlist?list=PL8dPuuaLjXtNlUrzyH5r6jN9ulIgZBpdo" target="_blank" rel="noopener">Crash Course Computer Science</a></td><td>Short, visual videos on how computers work</td></tr>
   </table></div>
   <p style="font-size:15px;color:var(--muted)">NPTEL lectures are free to watch any time.</p>
-
+  </div>
   <footer>CSE-1003 Fundamentals of Computer Programming, Department of CSE, IIIT Bhopal.<br>Questions about the course? Email Dr Sachin D N at <a href="mailto:sachin.dn@iiitbhopal.ac.in">sachin.dn@iiitbhopal.ac.in</a>.<br>Links checked October 2026.</footer>
 </div>
 
@@ -214,6 +258,23 @@
                (t[3].length ? '<dt>Try</dt><dd>' + links(t[3]) + '</dd>' : '');
     return '<details class="topic"><summary><span class="n">' + (i + 1) + '</span>' + t[0] + '</summary><dl class="res">' + rows + '</dl></details>';
   }).join("");
+</script>
+
+<script>
+  (function () {
+    var tabs = document.querySelectorAll(".mtab");
+    function show(id, push) {
+      tabs.forEach(function (t) {
+        var on = t.getAttribute("aria-controls") === id;
+        t.setAttribute("aria-selected", on ? "true" : "false");
+        document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
+      });
+      if (push) { try { history.replaceState(null, "", "#" + id); } catch (e) {} }
+    }
+    tabs.forEach(function (t) { t.addEventListener("click", function () { show(t.getAttribute("aria-controls"), true); }); });
+    var start = (location.hash || "").slice(1);
+    show(document.getElementById(start) && start !== "" ? start : "module-2", false);
+  })();
 </script>
 </body>
 </html>
