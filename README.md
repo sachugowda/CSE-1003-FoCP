@@ -9,9 +9,57 @@ Course resources for B.Tech first-year students, IIIT Bhopal.
 🌐 **Course website:** <https://sachugowda.github.io/CSE-1003-FoCP/><br>
 Slides, practice, the course assistant and resources for every module in one place. Works best on phones.
 
+**Jump to:** [📘 Module 1: Fundamentals](#module-1) · [📗 Module 2: Control statements](#module-2) · [📚 Free courses](#free-courses)
+
 ---
 
-## Module 1: Fundamentals of Programming
+<a id="module-2"></a>
+<details open>
+<summary><h2>📗 Module 2: Basic Programming and Control Statements</h2></summary>
+
+### ⭐ Start here
+
+| Class | Topics | Slides | Code |
+|---|---|---|---|
+| **Class 1: From Code to Program** | Structure of a C program, life cycle, keywords, identifiers, data types, variables, constants, input/output | [Open slides (PDF)](https://github.com/sachugowda/CSE-1003-FoCP/blob/main/Module-2/class1/FoCP%20Module%202%20%C2%B7%20Class%201%20%E2%80%94%20From%20Code%20to%20Program.pdf) | [Code](https://github.com/sachugowda/CSE-1003-FoCP/tree/main/Module-2/class1) |
+| **Class 2: Calculate and Decide** | Operators, type conversion and type casting, conditional branching (if, else-if, switch) | [Open slides (PDF)](https://github.com/sachugowda/CSE-1003-FoCP/blob/main/Module-2/class2/FoCP%20Module%202%20%C2%B7%20Class%202%20%E2%80%94%20Calculate%20and%20Decide.pdf) | [Code](https://github.com/sachugowda/CSE-1003-FoCP/tree/main/Module-2/class2/code) |
+| **Class 3: Repeat Until Done** | Iterative statements (while, for, do-while), nested loops, break and continue | [Open slides (PDF)](https://github.com/sachugowda/CSE-1003-FoCP/blob/main/Module-2/class3/FoCP%20Module%202%20%C2%B7%20Class%203%20%E2%80%94%20Repeat%20Until%20Done.pdf) | [Code](https://github.com/sachugowda/CSE-1003-FoCP/tree/main/Module-2/class3/code) |
+
+🧪 **[Play with Concepts](https://sachugowda.github.io/CSE-1003-FoCP/practice/module2-playground.html)**: predict it, run it, break it, fix it, for all three classes  ·  🤖 **Assistant:** coming soon
+
+### ▶️ Run the class programs in your browser
+
+Open a link, type any input in the input box, then press **Run**.
+
+**Class 1: From Code to Program:** [bill.c](https://www.onlinegdb.com/r0IkkMjzI) (Canteen bill) · [bill_blanks.c](https://onlinegdb.com/sio4ZG1L6) (Fill in the blanks) · [task1_broken.c](https://onlinegdb.com/rVU0IAlIQ) (Fix 3 bugs)
+
+**Class 2: Calculate and Decide:** [ops_blanks.c](https://onlinegdb.com/v5nx6m5Pa) (Operators fill-in) · [tc_blanks.c](https://onlinegdb.com/QD8AGNrgP) (Type conversion fill-in) · [bill2.c](https://onlinegdb.com/rUwfGyteW) (Bill with discount) · [menu.c](https://onlinegdb.com/vytRSpLVMZ) (switch menu) · [bill2_blanks.c](https://onlinegdb.com/VRSF3kAW4) (Final fill-in)
+
+**Class 3: Repeat Until Done:** [collatz.c](https://onlinegdb.com/zF1-YZZV3) (3n + 1 puzzle) · [miss_sum.c](https://onlinegdb.com/XTp09_nnB) (Missing line) · [miss_pattern.c](https://onlinegdb.com/mO4omS1u2) (Missing line) · [broken_table.c](https://onlinegdb.com/aAWDAk8fH) (Fix 3 bugs) · [canteen3.c](https://onlinegdb.com/fEd5M0-HI) (Canteen counter) · [seats.c](https://onlinegdb.com/_zOm6Xm2Y) (Cinema seats) · [canteen3_missing.c](https://onlinegdb.com/oG63uc1EI) (3 missing lines) · [grains.c](https://onlinegdb.com/DVDy76PPW) (Chessboard puzzle)
+
+### ✍️ Exam-style questions
+
+1. Write a C program to read marks in 3 subjects and print the total and the average with 2 decimal places. Explain why `(float)` is needed.
+2. What do `7 / 2`, `7 % 2`, `7 / 2.0` and `(float)(7 / 2)` give? Explain each answer.
+3. Write a program using `switch` for a canteen menu: 1 Chai ₹10, 2 Samosa ₹15, 3 Maggi ₹40, anything else prints "No such item". What happens if one `break` is missing?
+4. Write a program to print the multiplication table of a number using a `for` loop. Rewrite it using `while`.
+5. Print a star triangle with n rows using nested loops. Explain the difference between `break` and `continue` with one example each.
+
+**Check your work:** run your program in OnlineGDB with two or three different inputs, including a boundary value.
+
+### 📚 Go deeper
+
+| Class | Read (W3Schools) | Watch |
+|---|---|---|
+| Class 1 | [C Syntax](https://www.w3schools.com/c/c_syntax.php) · [Output](https://www.w3schools.com/c/c_output.php) · [Variables](https://www.w3schools.com/c/c_variables.php) · [Data Types](https://www.w3schools.com/c/c_data_types.php) · [Constants](https://www.w3schools.com/c/c_constants.php) · [User Input](https://www.w3schools.com/c/c_user_input.php) | [NPTEL: Problem Solving through Programming in C](https://nptel.ac.in/courses/106105171) |
+| Class 2 | [Operators](https://www.w3schools.com/c/c_operators.php) · [Type Conversion](https://www.w3schools.com/c/c_type_conversion.php) · [If...Else](https://www.w3schools.com/c/c_conditions.php) · [Switch](https://www.w3schools.com/c/c_switch.php) | [NPTEL: Problem Solving through Programming in C](https://nptel.ac.in/courses/106105171) |
+| Class 3 | [While Loop](https://www.w3schools.com/c/c_while_loop.php) · [For Loop](https://www.w3schools.com/c/c_for_loop.php) · [Break/Continue](https://www.w3schools.com/c/c_break_continue.php) | [NPTEL: Problem Solving through Programming in C](https://nptel.ac.in/courses/106105171) |
+
+</details>
+
+<a id="module-1"></a>
+<details>
+<summary><h2>📘 Module 1: Fundamentals of Programming</h2></summary>
 
 ### ⭐ Start here
 
@@ -19,18 +67,18 @@ Slides, practice, the course assistant and resources for every module in one pla
 |---|---|---|
 | 📊 **Slides** | Class 1: Why learn the fundamentals in the AI era | [Open slides](https://github.com/sachugowda/CSE-1003-FoCP/tree/main/CS1) |
 | 📊 **Slides** | Module 1 recap: the canteen bill | [Open recap](https://github.com/sachugowda/CSE-1003-FoCP/tree/main/Module-1-Recap) |
-| 🧪 **Practice** | Binary switches, name the error, trace the loop, algorithms and flowcharts | [Module 1 practice](https://sachugowda.github.io/CSE-1003-FoCP/practice/module1-practice.html) |
-| 🤖 **Assistant** | Your Module 1 study partner: ask any doubt, get concepts explained simply, revise before exams, or get a hint when stuck on practice | [Module 1 assistant](https://notebook.google.com/notebook/d21e64a6-0d1c-4e65-ac2d-39fe2dfde9be) |
+| 🧪 **Play with Concepts** | Binary switches, name the error, trace the loop, algorithms and flowcharts | [Start playing](https://sachugowda.github.io/CSE-1003-FoCP/practice/module1-practice.html) |
+| 🤖 **Assistant** | Your Module 1 study partner: ask any doubt, get concepts explained simply, revise before exams, or get a hint when stuck in Play with Concepts | [Module 1 assistant](https://notebook.google.com/notebook/d21e64a6-0d1c-4e65-ac2d-39fe2dfde9be) |
 
 **How to study:** go through the slides, then practise. Use the assistant any time you want to understand something better. For example:
 - "Explain the difference between a compiler and an interpreter with an example."
 - "Show me how to convert 45 to binary, step by step."
 - "Give me 5 questions to test myself on flowcharts."
-- Stuck on the practice page? Tap **Copy question** and paste it into the assistant for a hint.
+- Stuck in Play with Concepts? Tap **Copy question** and paste it into the assistant for a hint.
 
 ### ✍️ Exam-style questions
 
-The practice page checks quick answers. These questions practise what exams ask you to **write and draw**. Solve them on paper first.
+Play with Concepts checks quick answers. These questions practise what exams ask you to **write and draw**. Solve them on paper first.
 
 1. Convert 75 to binary, octal and hexadecimal.
 2. Write the word CHAI in ASCII codes, then in binary.
@@ -59,8 +107,11 @@ The practice page checks quick answers. These questions practise what exams ask 
 | 13 | Flowcharts | [Algorithm vs Flowchart (GfG)](https://www.geeksforgeeks.org/dsa/difference-between-algorithm-and-flowchart/) | [NPTEL Week 1: flowcharts](https://nptel.ac.in/courses/106105171) | [Flowgorithm](http://www.flowgorithm.org/) (runs your flowchart, Windows) · [draw.io](https://app.diagrams.net/) |
 | 14 | Pseudocode | [What is Pseudocode (GfG)](https://www.geeksforgeeks.org/dsa/what-is-pseudocode-a-complete-tutorial/) | [NPTEL Week 1: pseudocode](https://nptel.ac.in/courses/106105171) | [Flowgorithm](http://www.flowgorithm.org/): shows the code for your flowchart |
 
+</details>
+
 ---
 
+<a id="free-courses"></a>
 ## 📚 Full online courses (free)
 
 | Course | Why take it |
