@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Play with Concepts: Module 2 · FoCP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bench: #EEF1F4;
+    --panel: #FFFFFF;
+    --line: #D3DAE3;
+    --ink: #14202E;
+    --muted: #5A6778;
+    --signal: #F2A900;
+    --signal-soft: #FFF3D1;
+    --wire: #1F5FBF;
+    --wire-soft: #E4ECF8;
+    --good: #1E7A50;
+    --good-soft: #E1F2E9;
+    --bad: #B8332A;
+    --bad-soft: #FAE5E3;
+    --sans: "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+    --mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bench);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 32px 20px 56px; }
+
+  header h1 { font-size: 30px; line-height: 1.2; margin: 0 0 6px; font-weight: 700; }
+  header p { margin: 0; color: var(--muted); }
+
+  .tabs { display: flex; gap: 6px; margin: 28px 0 0; border-bottom: 2px solid var(--line); flex-wrap: wrap; }
+  .tab {
+    font: 600 16px var(--sans); color: var(--muted);
+    background: none; border: none; padding: 10px 14px 12px; cursor: pointer;
+    border-bottom: 3px solid transparent; margin-bottom: -2px;
+  }
+  .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--wire); }
+  .tab:hover { color: var(--ink); }
+
+  .panel { background: var(--panel); border: 1px solid var(--line); border-top: none; border-radius: 0 0 10px 10px; padding: 26px 24px 28px; }
+  .panel[hidden] { display: none; }
+
+  .bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 22px; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .seg button { font: 500 15px var(--sans); border: none; background: var(--panel); color: var(--muted); padding: 7px 12px; cursor: pointer; }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .seg button[aria-pressed="true"] { background: var(--wire-soft); color: var(--wire); font-weight: 600; }
+  .score { font-size: 15px; color: var(--muted); }
+  .score b { color: var(--ink); }
+
+  .prompt { font-size: 19px; margin: 0 0 4px; }
+  .target { font: 600 64px/1.1 var(--mono); margin: 6px 0 22px; letter-spacing: 1px; }
+  .target small { font: 500 18px var(--sans); color: var(--muted); margin-left: 8px; letter-spacing: 0; }
+
+  /* switches: the one bold element */
+  .board { display: flex; gap: 8px; justify-content: flex-start; margin: 4px 0 8px; flex-wrap: nowrap; }
+  .sw { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 0 1 64px; min-width: 34px; }
+  .sw .bit { font: 600 18px var(--mono); color: var(--muted); }
+  .sw.on .bit { color: var(--ink); }
+  .toggle {
+    width: 100%; max-width: 54px; height: 92px; border-radius: 10px;
+    background: #2A3442; border: 2px solid #1A222D; position: relative; cursor: pointer; padding: 0;
+  }
+  .toggle::after {
+    content: ""; position: absolute; left: 6px; right: 6px; height: 38px; bottom: 6px;
+    border-radius: 7px; background: #5E6B7C; transition: bottom .15s ease, background .15s ease, box-shadow .15s ease;
+  }
+  .sw.on .toggle::after { bottom: 44px; background: var(--signal); box-shadow: 0 0 18px 4px rgba(242,169,0,.55); }
+  .toggle:disabled { cursor: default; }
+  .sw .w { font: 500 14px var(--mono); color: var(--muted); }
+  .live { font: 500 16px var(--mono); color: var(--muted); margin: 8px 0 18px; min-height: 24px; }
+
+  input[type="text"], input[type="number"] {
+    font: 600 26px var(--mono); width: 200px; padding: 8px 12px;
+    border: 2px solid var(--line); border-radius: 8px; color: var(--ink); background: var(--panel);
+  }
+  input:focus { outline: none; border-color: var(--wire); }
+
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 18px; }
+  .btn { font: 600 16px var(--sans); border-radius: 8px; padding: 10px 18px; cursor: pointer; border: 2px solid var(--wire); }
+  .btn.primary { background: var(--wire); color: #fff; }
+  .btn.ghost { background: var(--panel); color: var(--wire); }
+  .btn:disabled { opacity: .45; cursor: default; }
+
+  .feedback { margin-top: 18px; padding: 14px 16px; border-radius: 8px; display: none; }
+  .feedback.show { display: block; }
+  .feedback.ok { background: var(--good-soft); color: var(--good); }
+  .feedback.no { background: var(--bad-soft); color: var(--bad); }
+  .feedback p { margin: 4px 0 0; color: var(--ink); }
+  .feedback strong { font-size: 17px; }
+
+  pre {
+    background: #14202E; color: #E6EBF2; font: 15.5px/1.6 var(--mono);
+    padding: 16px 18px; border-radius: 8px; overflow-x: auto; margin: 10px 0 18px;
+  }
+  .task { color: var(--muted); margin: 0 0 4px; }
+  .choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+  .choice { font: 600 16px var(--sans); text-align: left; padding: 12px 14px; border-radius: 8px; border: 2px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+  .choice:hover:not(:disabled) { border-color: var(--wire); }
+  .choice.right { border-color: var(--good); background: var(--good-soft); color: var(--good); }
+  .choice.wrong { border-color: var(--bad); background: var(--bad-soft); color: var(--bad); }
+  .choice:disabled { cursor: default; }
+
+  table.trace { border-collapse: collapse; margin-top: 12px; font-family: var(--mono); font-size: 15px; }
+  table.trace th, table.trace td { border: 1px solid var(--line); padding: 5px 14px; text-align: right; }
+  table.trace th { background: var(--bench); font-weight: 600; }
+
+
+  .steps { display: flex; flex-direction: column; gap: 8px; }
+  .step { font: 500 16px var(--sans); text-align: left; padding: 10px 14px; border-radius: 8px; border: 2px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+  .step:hover:not(:disabled) { border-color: var(--wire); }
+  .step:disabled { opacity: .35; cursor: default; }
+  .fixed { padding: 8px 14px; border-radius: 8px; background: var(--bench); color: var(--muted); font-weight: 600; }
+  ol.mine { margin: 6px 0 0; padding-left: 26px; min-height: 30px; }
+  ol.mine li { padding: 5px 0; }
+  ol.mine li.right { color: var(--good); } ol.mine li.wrong { color: var(--bad); }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 620px) { .cols { grid-template-columns: 1fr; } }
+  .h3 { font-weight: 600; margin: 0 0 6px; }
+  .shape-choice { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+  .shape-choice svg { width: 96px; height: 52px; }
+  .statement { font: 600 26px var(--mono); margin: 8px 0 20px; padding: 14px 18px; background: var(--bench); border-radius: 8px; }
+
+  .help { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: var(--wire-soft); border: 1px solid var(--line); border-top: none; padding: 10px 16px; font-size: 15px; }
+  .help span:first-child { flex: 1 1 260px; }
+  .btn.small { padding: 6px 12px; font-size: 14px; text-decoration: none; display: inline-block; }
+  .copied { color: var(--good); font-weight: 600; }
+  .tip { margin-top: 26px; font-size: 15px; color: var(--muted); }
+  footer { margin-top: 28px; font-size: 14px; color: var(--muted); }
+
+  button:focus-visible, .tab:focus-visible, .toggle:focus-visible { outline: 3px solid var(--wire); outline-offset: 2px; }
+  @media (max-width: 520px) {
+    .target { font-size: 48px; }
+    .toggle { height: 78px; }
+    .toggle::after { height: 31px; }
+    .sw.on .toggle::after { bottom: 37px; }
+    .panel { padding: 22px 16px 24px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .toggle::after { transition: none; } }
+
+  .opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; margin-top: 6px; }
+  .opts .choice.mono { font-family: var(--mono); white-space: pre; }
+  .qtext { font-size: 19px; margin: 0 0 6px; }
+  .sub { color: var(--muted); font-size: 15px; margin: 0 0 4px; }
+  .tagline { font-style: italic; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Play with Concepts: Module 2</h1>
+    <p><span class="tagline">Predict it, run it, break it, fix it.</span> Basic programming and control statements, CSE-1003, IIIT Bhopal. Every question is new, so play as long as you like.</p>
+  </header>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" aria-controls="p-c1">Class 1: Code basics</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-c2">Class 2: Calculate and decide</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-c3">Class 3: Loops</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-fix">Missing lines and bugs</button>
+  </div>
+  <div class="help" id="help">
+    <span>Stuck? Copy the question and ask the course assistant for a hint.</span>
+    <button class="btn ghost small" id="copy-q">Copy question</button>
+    <a class="btn primary small" id="ask-link" target="_blank" rel="noopener">Open assistant</a>
+    <span class="copied" id="copied" aria-live="polite"></span>
+  </div>
+
+  <section class="panel" id="p-c1" role="tabpanel">
+    <div class="bar"><div class="seg" aria-label="Practice type" style="flex-wrap:wrap"><button data-tab="c1" data-mode="id" aria-pressed="true">Valid name?</button><button data-tab="c1" data-mode="dt" aria-pressed="false">Pick the data type</button><button data-tab="c1" data-mode="pf" aria-pressed="false">What does printf print?</button></div><div class="score" id="s-c1"></div></div>
+    <div id="q-c1"></div>
+    <div class="feedback" id="fb-c1" aria-live="polite"></div>
+    <div class="actions"><button class="btn ghost" data-next="c1">Next question</button></div>
+  </section>
+
+  <section class="panel" id="p-c2" role="tabpanel" hidden>
+    <div class="bar"><div class="seg" aria-label="Practice type" style="flex-wrap:wrap"><button data-tab="c2" data-mode="ex" aria-pressed="true">Predict the value</button><button data-tab="c2" data-mode="br" aria-pressed="false">Which branch runs?</button></div><div class="score" id="s-c2"></div></div>
+    <div id="q-c2"></div>
+    <div class="feedback" id="fb-c2" aria-live="polite"></div>
+    <div class="actions"><button class="btn ghost" data-next="c2">Next question</button></div>
+  </section>
+
+  <section class="panel" id="p-c3" role="tabpanel" hidden>
+    <div class="bar"><div class="seg" aria-label="Practice type" style="flex-wrap:wrap"><button data-tab="c3" data-mode="cnt" aria-pressed="true">How many times?</button><button data-tab="c3" data-mode="bc" aria-pressed="false">break or continue</button><button data-tab="c3" data-mode="tr" aria-pressed="false">Trace the loop</button></div><div class="score" id="s-c3"></div></div>
+    <div id="q-c3"></div>
+    <div class="feedback" id="fb-c3" aria-live="polite"></div>
+    <div class="actions"><button class="btn ghost" data-next="c3">Next question</button></div>
+  </section>
+
+  <section class="panel" id="p-fix" role="tabpanel" hidden>
+    <div class="bar"><div class="seg" aria-label="Practice type" style="flex-wrap:wrap"><button data-tab="fix" data-mode="miss" aria-pressed="true">Pick the missing line</button><button data-tab="fix" data-mode="bug" aria-pressed="false">Find the bug</button></div><div class="score" id="s-fix"></div></div>
+    <div id="q-fix"></div>
+    <div class="feedback" id="fb-fix" aria-live="polite"></div>
+    <div class="actions"><button class="btn ghost" data-next="fix">Next question</button></div>
+  </section>
+  <footer>CSE-1003 Fundamentals of Computer Programming, IIIT Bhopal</footer>
+</div>
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var R = function (a, b) { return a + Math.floor(Math.random() * (b - a + 1)); };
+  var pick = function (a) { return a[R(0, a.length - 1)]; };
+  var esc = function (s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); };
+  var shuffle = function (a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = R(0, i), t = a[i]; a[i] = a[j]; a[j] = t; } return a; };
+  var idiv = function (a, b) { return Math.trunc(a / b); };
+  var fmt = function (x) { return Math.abs(x - Math.round(x)) < 1e-9 ? String(Math.round(x)) : x.toFixed(2); };
+
+  /* ---------- scores ---------- */
+  var KEY = "focp-m2-best", scores = {};
+  ["c1", "c2", "c3", "fix"].forEach(function (k) { scores[k] = { r: 0, t: 0, s: 0, best: 0 }; });
+  try { var sv = JSON.parse(localStorage.getItem(KEY) || "{}"); Object.keys(sv).forEach(function (k) { if (scores[k]) scores[k].best = sv[k]; }); } catch (e) {}
+  function showScore(k) { var s = scores[k]; $("s-" + k).innerHTML = "Correct <b>" + s.r + "/" + s.t + "</b>, streak <b>" + s.s + "</b>, best <b>" + s.best + "</b>"; }
+  function record(k, ok) { var s = scores[k]; s.t++; if (ok) { s.r++; s.s++; } else s.s = 0;
+    if (s.s > s.best) { s.best = s.s; try { var b = {}; Object.keys(scores).forEach(function (x) { b[x] = scores[x].best; }); localStorage.setItem(KEY, JSON.stringify(b)); } catch (e) {} }
+    showScore(k); }
+  Object.keys(scores).forEach(showScore);
+
+  /* ---------- question renderer ----------
+     q = {text, code?, options? [strings], answer (string or number), numeric?: bool, tol?, mono?: bool, why} */
+  var cur = {};
+  function render(k, q) {
+    cur[k] = { q: q, done: false };
+    var h = '<p class="qtext">' + q.text + '</p>';
+    if (q.code) h += '<pre><code>' + esc(q.code) + '</code></pre>';
+    if (q.options) {
+      h += '<div class="opts">' + q.options.map(function (o, i) { return '<button class="choice' + (q.mono ? ' mono' : '') + '" data-i="' + i + '">' + esc(o) + '</button>'; }).join("") + '</div>';
+    } else {
+      h += '<label class="task" for="in-' + k + '">Your answer</label><br><input type="' + (q.numeric ? "number" : "text") + '" step="any" id="in-' + k + '" autocomplete="off">' +
+           '<div class="actions"><button class="btn primary" id="chk-' + k + '">Check</button></div>';
+    }
+    $("q-" + k).innerHTML = h; $("fb-" + k).className = "feedback"; $("fb-" + k).innerHTML = "";
+    if (q.options) {
+      $("q-" + k).querySelectorAll(".choice").forEach(function (b) { b.addEventListener("click", function () {
+        if (cur[k].done) return; cur[k].done = true; var i = +b.dataset.i, ok = q.options[i] === q.answer;
+        $("q-" + k).querySelectorAll(".choice").forEach(function (x) { x.disabled = true; var oi = +x.dataset.i;
+          if (q.options[oi] === q.answer) x.classList.add("right"); else if (oi === i) x.classList.add("wrong"); });
+        finish(k, ok); }); });
+    } else {
+      var go = function () { if (cur[k].done) return; var v = $("in-" + k).value.trim(); if (v === "") { fb(k, false, "Type your answer first.", ""); return; }
+        var ok;
+        if (q.numeric) ok = Math.abs(parseFloat(v) - q.answer) <= (q.tol || 1e-9);
+        else ok = v.replace(/\s+/g, " ").toLowerCase() === String(q.answer).replace(/\s+/g, " ").toLowerCase();
+        cur[k].done = true; $("chk-" + k).disabled = true; finish(k, ok); };
+      $("chk-" + k).addEventListener("click", go);
+      $("in-" + k).addEventListener("keydown", function (e) { if (e.key === "Enter") go(); });
+    }
+  }
+  function fb(k, ok, title, body) { var f = $("fb-" + k); f.className = "feedback show " + (ok ? "ok" : "no"); f.innerHTML = "<strong>" + title + "</strong>" + (body ? "<p>" + body + "</p>" : ""); }
+  function finish(k, ok) { var q = cur[k].q; record(k, ok);
+    var shown = q.numeric ? fmt(q.answer) : q.answer;
+    fb(k, ok, ok ? "Correct: " + esc(shown) + "." : "The answer is " + esc(shown) + ".", q.why); }
+
+  /* ---------- Class 1 ---------- */
+  var IDS = [["chai_price",1,"Letters and underscore only."],["2chai",0,"It starts with a digit."],["total bill",0,"It has a space."],["float",0,"float is a keyword."],
+    ["_count",1,"Valid, though names starting with _ are best avoided."],["price-1",0,"The minus sign is not allowed."],["Total",1,"Valid. Total and total are different names."],
+    ["samosaQty",1,"Letters only: valid."],["int",0,"int is a keyword."],["roll#no",0,"# is not allowed."],["maggi2",1,"A digit after the first letter is fine."],["return",0,"return is a keyword."]];
+  var DT = [["Number of chai cups ordered","int","A whole number."],["Price of a samosa: 12.50","float","A decimal number."],["Grade letter: A, B or C","char","A single character."],
+    ["Distance to the Moon in km, very precisely","double","A precise decimal needs double."],["Roll number: 23","int","A whole number."],["CGPA: 8.75","float","A decimal number."],
+    ["Item code letter: 'C'","char","A single character."],["Value of pi to 15 digits","double","Only double keeps about 15 digits."],["Students in the class: 60","int","A whole number."],["Body temperature: 36.6","float","A decimal number."]];
+  var PF = [['printf("%d", 20 + 15);',"35",["35","20 + 15","2015","%d"],"%d prints the value of the expression."],
+    ['printf("%.2f", 12.5);',"12.50",["12.50","12.5","12.500000","13"],"%.2f prints exactly 2 decimal places."],
+    ['printf("%f", 2.5);',"2.500000",["2.500000","2.5","2.50","2"],"%f prints 6 decimal places by default."],
+    ['printf("%c", 65);',"A",["A","65","a","%c"],"65 is the ASCII code of A."],
+    ['printf("%d", \'B\');',"66",["66","B","65","b"],"%d prints the ASCII code of B."],
+    ['printf("[%5d]", 42);',"[   42]",["[   42]","[42]","[42   ]","[00042]"],"%5d pads the number to width 5 on the left."],
+    ['printf("%d%%", 50);',"50%",["50%","50%%","50","%50"],"%% prints one % sign."],
+    ['printf("Total: Rs %d\\n", 75);',"Total: Rs 75",["Total: Rs 75","Total: Rs %d","Total: Rs 75\\n","75"],"\\n moves to a new line; it is not printed."]];
+  var C1 = {
+    id: function () { var x = pick(IDS); return { text: "Is this a valid C identifier?", code: x[0], options: ["Valid", "Invalid"], answer: x[1] ? "Valid" : "Invalid", why: x[2] }; },
+    dt: function () { var x = pick(DT); return { text: "Which data type fits best?<br><b>" + esc(x[0]) + "</b>", options: ["char", "int", "float", "double"], mono: true, answer: x[1], why: x[2] }; },
+    pf: function () { var x = pick(PF); return { text: "What does this print?", code: x[0], options: shuffle(x[2]), mono: true, answer: x[1], why: esc(x[3]) }; }
+  };
+  /* ---------- Class 2 ---------- */
+  var C2 = {
+    ex: function () { var a = R(7, 29), b = R(2, 6), t = R(0, 6), x;
+      if (t === 0) x = { code: a + " / " + b, ans: idiv(a, b), why: "Both are int, so the decimal part is dropped." };
+      else if (t === 1) x = { code: a + " % " + b, ans: a % b, why: "% gives the remainder: " + a + " = " + b + " × " + idiv(a, b) + " + " + (a % b) + "." };
+      else if (t === 2) x = { code: "(float) " + a + " / " + b, ans: a / b, why: "The cast happens first, so this is float division.", tol: 0.006 };
+      else if (t === 3) x = { code: "(float)(" + a + " / " + b + ")", ans: idiv(a, b), why: "The brackets divide first as ints (" + idiv(a, b) + "), then the cast is too late." };
+      else if (t === 4) x = { code: a + " > " + b + " && " + b + " > 3", ans: (a > b && b > 3) ? 1 : 0, why: "&& gives 1 only if both sides are true." };
+      else if (t === 5) x = { code: "int x = " + a + ", y;\ny = x++;      /* value of y? */", ans: a, why: "x++ gives the OLD value, then adds 1." };
+      else x = { code: "int x = " + a + ", y;\ny = ++x;      /* value of y? */", ans: a + 1, why: "++x adds 1 first, then gives the new value." };
+      return { text: "What is the value?", code: x.code, numeric: true, answer: x.ans, tol: x.tol, why: esc(x.why) }; },
+    br: function () { var t = R(0, 2);
+      if (t === 0) { var m = pick([R(30, 49), 50, R(51, 74), 75, R(76, 89), 90, R(91, 99)]), g = m >= 90 ? "A" : m >= 75 ? "B" : m >= 50 ? "C" : "F";
+        return { text: "Which grade is printed?", code: "int marks = " + m + ";\nif (marks >= 90) printf(\"A\");\nelse if (marks >= 75) printf(\"B\");\nelse if (marks >= 50) printf(\"C\");\nelse printf(\"F\");", options: ["A", "B", "C", "F"], answer: g, why: "C checks from the top and stops at the first true condition." }; }
+      if (t === 1) { var tot = pick([150, 180, 200, 200, 210, 250]), yes = tot > 200;
+        return { text: "Does Riya get the discount?", code: "int total = " + tot + ";\nif (total > 200)\n    printf(\"10%% off\");\nelse\n    printf(\"No discount\");", options: ["10% off", "No discount"], answer: yes ? "10% off" : "No discount", why: yes ? tot + " > 200 is true." : tot + " > 200 is false" + (tot === 200 ? ": exactly 200 is not MORE than 200." : ".") }; }
+      var code = R(1, 3), brk = Math.random() < 0.5, prices = [10, 15, 40], p;
+      if (brk) p = prices[code - 1]; else p = 0;
+      var src = "int code = " + code + ", price;\nswitch (code) {\n    case 1:  price = 10;" + (brk ? " break;" : "") + "\n    case 2:  price = 15;" + (brk ? " break;" : "") + "\n    case 3:  price = 40;" + (brk ? " break;" : "") + "\n    default: price = 0;\n}";
+      return { text: "What is the value of price?", code: src, numeric: true, answer: p, why: brk ? "break stops the switch at case " + code + "." : "No break: it falls through every case below, ending at default (0)." }; }
+  };
+  /* ---------- Class 3 ---------- */
+  var C3 = {
+    cnt: function () { var s = R(0, 3), e = R(4, 14), k = pick([1, 1, 2, 3]), le = Math.random() < 0.5, vals = [];
+      if (Math.random() < 0.12) { s = e + R(1, 3); }
+      for (var i = s; le ? i <= e : i < e; i += k) vals.push(i);
+      return { text: "How many times does the body run?", code: "for (i = " + s + "; i " + (le ? "<=" : "<") + " " + e + "; i " + (k === 1 ? "++" : "+= " + k) + ") {\n    printf(\"Hi \");\n}", numeric: true, answer: vals.length,
+        why: vals.length ? "i takes the values " + vals.join(", ") + "." : "The check fails at the start, so it runs 0 times." }; },
+    bc: function () { var n = R(5, 8), m = R(2, n - 1), useBreak = Math.random() < 0.5, out = [];
+      for (var i = 1; i <= n; i++) { if (i === m) { if (useBreak) break; else continue; } out.push(i); }
+      var full = [], brk = [], con = [];
+      for (i = 1; i <= n; i++) { full.push(i); if (i < m) brk.push(i); if (i !== m) con.push(i); }
+      var opts = shuffle([brk.join(" "), con.join(" "), full.join(" "), (brk.concat([m])).join(" ")]);
+      return { text: "What does it print?", code: "for (i = 1; i <= " + n + "; i++) {\n    if (i == " + m + ") " + (useBreak ? "break" : "continue") + ";\n    printf(\"%d \", i);\n}", options: opts, mono: true, answer: out.join(" "),
+        why: useBreak ? "break at i = " + m + " ends the whole loop." : "continue skips only i = " + m + "; the loop goes on." }; },
+    tr: function () { var t = R(0, 2);
+      if (t === 0) { var n = R(3, 7), s = 0; for (var i = 1; i <= n; i++) s += i; return { text: "What is sum after the loop?", code: "int sum = 0;\nfor (i = 1; i <= " + n + "; i++)\n    sum = sum + i;", numeric: true, answer: s, why: "1 + 2 + … + " + n + " = " + s + "." }; }
+      if (t === 1) { var a = R(15, 40), k = R(3, 7), x = a, c = 0; while (x > 0) { x -= k; c++; } return { text: "What is count after the loop?", code: "int x = " + a + ", count = 0;\nwhile (x > 0) {\n    x = x - " + k + ";\n    count++;\n}", numeric: true, answer: c, why: "x goes down by " + k + " until it is 0 or less: " + c + " rounds." }; }
+      var n2 = R(100, 9999), d = 0, s2 = 0, y = n2; while (y > 0) { s2 += y % 10; y = idiv(y, 10); d++; }
+      return { text: "What is sum after the loop?", code: "int n = " + n2 + ", sum = 0;\nwhile (n > 0) {\n    sum = sum + n % 10;\n    n = n / 10;\n}", numeric: true, answer: s2, why: "It adds the digits of " + n2 + ": " + String(n2).split("").join(" + ") + " = " + s2 + "." }; }
+  };
+  /* ---------- Missing lines and bugs ---------- */
+  var MISS = [
+    { code: "int n = 5, i = 1, sum = 0;\nwhile (i <= n) {\n    sum = sum + i;\n    ______\n}", opts: ["i++;", "sum++;", "i--;", "break;"], ans: "i++;", why: "Without i++, i stays 1 and the loop never ends." },
+    { code: "for (i = 1; i <= 4; i++) {\n    for (j = 1; j <= i; j++)\n        printf(\"* \");\n    ______\n}", opts: ["printf(\"\\n\");", "printf(\"* \");", "j++;", "break;"], ans: "printf(\"\\n\");", why: "A new line after each row makes the triangle shape." },
+    { code: "while (1) {\n    scanf(\"%d\", &code);\n    if (code == 0)\n        ______   /* stop taking orders */\n    ...\n}", opts: ["break;", "continue;", "code++;", "printf(\"0\");"], ans: "break;", why: "break leaves the while (1) loop." },
+    { code: "if (code < 1 || code > 3) {\n    printf(\"No such item\\n\");\n    ______   /* ask for the next code */\n}", opts: ["continue;", "break;", "return 0;", "code = 0;"], ans: "continue;", why: "continue skips the rest of this round and asks again." },
+    { code: "int qty;\nprintf(\"Quantity: \");\n______", opts: ["scanf(\"%d\", &qty);", "scanf(\"%d\", qty);", "scanf(\"%f\", &qty);", "printf(\"%d\", &qty);"], ans: "scanf(\"%d\", &qty);", why: "scanf needs %d for an int and & for the address." },
+    { code: "int total = 253;\nfloat avg;\n______   /* average of 3, with decimals */", opts: ["avg = (float) total / 3;", "avg = total / 3;", "avg = (float)(total / 3);", "avg = total % 3;"], ans: "avg = (float) total / 3;", why: "Cast BEFORE dividing: 84.33. The others give 84 or 1." },
+    { code: "int pin;\ndo {\n    scanf(\"%d\", &pin);\n} while (pin != 1234)___", opts: [";", "{", ":", "(nothing)"], ans: ";", why: "do-while is the only loop that ends with a semicolon." }];
+  var BUGS = [
+    { code: "1  for (i = 1; i <= 5; i++);\n2  {\n3      printf(\"%d \", i);\n4  }", ans: "Line 1", why: "The ; after for() ends the loop; the block runs once, after it." },
+    { code: "1  int marks = 72;\n2  if (marks = 100)\n3      printf(\"Full marks!\");", ans: "Line 2", why: "= stores 100. Use == to compare." },
+    { code: "1  int i = 1, sum = 0;\n2  while (i <= 5) {\n3      sum = sum + i;\n4  }", ans: "Line 3", why: "Nothing changes i, so the loop never ends. Add i++ after line 3." },
+    { code: "1  int a = 85, b = 90, c = 78;\n2  float avg;\n3  avg = (a + b + c) / 3;\n4  printf(\"%.2f\", avg);", ans: "Line 3", why: "Integer division gives 84.00. Use (float)(a + b + c) / 3." },
+    { code: "1  /* print 1 to 10 */\n2  for (i = 1; i < 10; i++)\n3      printf(\"%d \", i);", ans: "Line 2", why: "< 10 stops at 9. Use <= 10." },
+    { code: "1  switch (code) {\n2      case 1: price = 10;\n3      case 2: price = 15; break;\n4  }", ans: "Line 2", why: "case 1 has no break, so it falls into case 2: price becomes 15." }];
+  var FIX = {
+    miss: function () { var x = pick(MISS); return { text: "Which line goes in the blank?", code: x.code, options: shuffle(x.opts), mono: true, answer: x.ans, why: esc(x.why) }; },
+    bug: function () { var x = pick(BUGS); var n = x.code.split("\n").length, opts = []; for (var i = 1; i <= n; i++) opts.push("Line " + i);
+      return { text: "Which line has the bug?", code: x.code, options: opts, answer: x.ans, why: esc(x.why) }; }
+  };
+  var GEN = { c1: C1, c2: C2, c3: C3, fix: FIX }, MODE = { c1: "id", c2: "ex", c3: "cnt", fix: "miss" }, last = {};
+  function next(k) { var g = GEN[k][MODE[k]]; var q, tries = 0; do { q = g(); tries++; } while (tries < 5 && last[k] && q.code === last[k].code && q.text === last[k].text); last[k] = q; render(k, q); }
+  document.querySelectorAll("[data-mode]").forEach(function (b) { b.addEventListener("click", function () {
+    var k = b.dataset.tab; MODE[k] = b.dataset.mode;
+    document.querySelectorAll('[data-tab="' + k + '"]').forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+    next(k); }); });
+  document.querySelectorAll("[data-next]").forEach(function (b) { b.addEventListener("click", function () { next(b.dataset.next); }); });
+  /* tabs */
+  var tabs = document.querySelectorAll(".tab");
+  tabs.forEach(function (t) { t.addEventListener("click", function () { tabs.forEach(function (x) { x.setAttribute("aria-selected", x === t ? "true" : "false"); $(x.getAttribute("aria-controls")).hidden = x !== t; }); }); });
+  /* ask the assistant */
+  var ASSISTANT_URL = "";
+  if (ASSISTANT_URL) $("ask-link").href = ASSISTANT_URL; else $("ask-link").style.display = "none";
+  $("copy-q").addEventListener("click", function () {
+    var p = document.querySelector(".panel:not([hidden])"), tab = document.querySelector('.tab[aria-selected="true"]').textContent;
+    var k = p.id.replace("p-", ""), q = cur[k] && cur[k].q;
+    var text = "FoCP Module 2, Play with Concepts, " + tab + ":\n\n" + (q ? q.text.replace(/<[^>]+>/g, " ") + (q.code ? "\n\n" + q.code : "") + (q.options ? "\n\nOptions: " + q.options.join(" | ") : "") : "") + "\n\nI'm stuck. Please give me a hint, not the full answer.";
+    function done() { $("copied").textContent = "Copied"; setTimeout(function () { $("copied").textContent = ""; }, 2000); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fb2); else fb2();
+    function fb2() { var ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); done(); } catch (e) {} document.body.removeChild(ta); }
+  });
+  ["c1", "c2", "c3", "fix"].forEach(next);
+  window.__GEN = GEN;
+})();
+</script>
+</body>
+</html>
