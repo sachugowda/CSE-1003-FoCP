@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FoCP Practice: Module 1</title>
+<title>Play with Concepts: Module 1 · FoCP</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -153,8 +153,8 @@
 <body>
 <div class="wrap">
   <header>
-    <h1>Module 1 practice</h1>
-    <p>Fundamentals of Computer Programming (CSE-1003), IIIT Bhopal. Practise as often as you like; every question is new.</p>
+    <h1>Play with Concepts: Module 1</h1>
+    <p><span style="font-style:italic">Predict it, try it, check it, learn it.</span> Fundamentals of Computer Programming (CSE-1003), IIIT Bhopal. Every question is new, so play as long as you like.</p>
   </header>
 
   <div class="tabs" role="tablist">
@@ -567,7 +567,7 @@
   $("copy-q").addEventListener("click", function () {
     var p = document.querySelector(".panel:not([hidden])");
     var tab = document.querySelector('.tab[aria-selected="true"]').textContent;
-    var parts = ["FoCP Module 1 practice, " + tab + ":"];
+    var parts = ["FoCP Module 1, Play with Concepts, " + tab + ":"];
     p.querySelectorAll(".prompt, .target, .statement, pre, #pool, #mine").forEach(function (el) {
       var t;
       if (el.id === "pool") t = "Steps: " + Array.prototype.map.call(el.children, function (c) { return c.textContent; }).join(" | ");
