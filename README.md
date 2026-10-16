@@ -25,7 +25,7 @@ Slides, practice, the course assistant and resources for every module in one pla
 | **Class 2: Calculate and Decide** | Operators, type conversion and type casting, conditional branching (if, else-if, switch) | [Open slides (PDF)](https://github.com/sachugowda/CSE-1003-FoCP/blob/main/Module-2/class2/FoCP%20Module%202%20%C2%B7%20Class%202%20%E2%80%94%20Calculate%20and%20Decide.pdf) | [Code](https://github.com/sachugowda/CSE-1003-FoCP/tree/main/Module-2/class2/code) |
 | **Class 3: Repeat Until Done** | Iterative statements (while, for, do-while), nested loops, break and continue | [Open slides (PDF)](https://github.com/sachugowda/CSE-1003-FoCP/blob/main/Module-2/class3/FoCP%20Module%202%20%C2%B7%20Class%203%20%E2%80%94%20Repeat%20Until%20Done.pdf) | [Code](https://github.com/sachugowda/CSE-1003-FoCP/tree/main/Module-2/class3/code) |
 
-🧪 **[Play with Concepts](https://sachugowda.github.io/CSE-1003-FoCP/practice/module2-playground.html)**: predict it, run it, break it, fix it, for all three classes  ·  🤖 **Assistant:** coming soon
+🧪 **[Play with Concepts](https://sachugowda.github.io/CSE-1003-FoCP/practice/module2-playground.html)**: predict it, run it, break it, fix it, for all three classes  ·  🤖 **[Module 2 assistant](https://notebook.google.com/notebook/d659fdb6-bb4f-4165-b843-cfd6d64b1b61)**: type *hi* to start, ask any doubt, or paste a Play with Concepts question for a hint
 
 ### ▶️ Run the class programs in your browser
 
