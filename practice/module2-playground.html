@@ -353,7 +353,7 @@
   var tabs = document.querySelectorAll(".tab");
   tabs.forEach(function (t) { t.addEventListener("click", function () { tabs.forEach(function (x) { x.setAttribute("aria-selected", x === t ? "true" : "false"); $(x.getAttribute("aria-controls")).hidden = x !== t; }); }); });
   /* ask the assistant */
-  var ASSISTANT_URL = "";
+  var ASSISTANT_URL = "https://notebook.google.com/notebook/d659fdb6-bb4f-4165-b843-cfd6d64b1b61";
   if (ASSISTANT_URL) $("ask-link").href = ASSISTANT_URL; else $("ask-link").style.display = "none";
   $("copy-q").addEventListener("click", function () {
     var p = document.querySelector(".panel:not([hidden])"), tab = document.querySelector('.tab[aria-selected="true"]').textContent;
