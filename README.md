@@ -25,7 +25,7 @@ Slides, practice, the course assistant and resources for every module in one pla
 | **Class 2: Copy or Key?** | Call by value, call by reference, the stack (shown with a debugger), scope of variables, storage classes | [Open slides (PDF)](https://github.com/sachugowda/CSE-1003-FoCP/blob/main/Module-3/class2/FoCP%20Module%203%20%C2%B7%20Class%202%20%E2%80%94%20Copy%20or%20Key.pdf) | [Code](https://github.com/sachugowda/CSE-1003-FoCP/tree/main/Module-3/class2/code) |
 | **Class 3: The Function That Calls Itself** | Recursive functions, recursion versus iteration | [Open slides (PDF)](https://github.com/sachugowda/CSE-1003-FoCP/blob/main/Module-3/class3/FoCP%20Module%203%20%C2%B7%20Class%203%20%E2%80%94%20The%20Function%20That%20Calls%20Itself.pdf) | [Code](https://github.com/sachugowda/CSE-1003-FoCP/tree/main/Module-3/class3/code) |
 
-🧪 **[Play with Concepts](https://sachugowda.github.io/CSE-1003-FoCP/practice/module3-playground.html)**: predict it, run it, break it, fix it, for all three classes  ·  🤖 **Module 3 assistant:** coming soon
+🧪 **[Play with Concepts](https://sachugowda.github.io/CSE-1003-FoCP/practice/module3-playground.html)**: predict it, run it, break it, fix it, for all three classes  ·  🤖 **[Module 3 assistant](https://notebook.google.com/notebook/c4868271-7a90-4008-b751-02390816c359)**: type *hi* to start, ask any doubt, or paste a Play with Concepts question for a hint
 
 ### ▶️ Run the class programs in your browser
 
