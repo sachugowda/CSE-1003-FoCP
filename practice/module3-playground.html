@@ -451,7 +451,7 @@
   var tabs = document.querySelectorAll(".tab");
   tabs.forEach(function (t) { t.addEventListener("click", function () { tabs.forEach(function (x) { x.setAttribute("aria-selected", x === t ? "true" : "false"); $(x.getAttribute("aria-controls")).hidden = x !== t; }); }); });
   /* ask the assistant */
-  var ASSISTANT_URL = "";   /* paste the Module 3 NotebookLM link here when it is ready */
+  var ASSISTANT_URL = "https://notebook.google.com/notebook/c4868271-7a90-4008-b751-02390816c359";
   if (ASSISTANT_URL) $("ask-link").href = ASSISTANT_URL; else $("ask-link").style.display = "none";
   $("copy-q").addEventListener("click", function () {
     var p = document.querySelector(".panel:not([hidden])"), tab = document.querySelector('.tab[aria-selected="true"]').textContent;
