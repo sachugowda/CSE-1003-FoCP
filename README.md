@@ -9,12 +9,58 @@ Course resources for B.Tech first-year students, IIIT Bhopal.
 🌐 **Course website:** <https://sachugowda.github.io/CSE-1003-FoCP/><br>
 Slides, practice, the course assistant and resources for every module in one place. Works best on phones.
 
-**Jump to:** [📘 Module 1: Fundamentals](#module-1) · [📗 Module 2: Control statements](#module-2) · [📚 Free courses](#free-courses)
+**Jump to:** [📘 Module 1: Fundamentals](#module-1) · [📗 Module 2: Control statements](#module-2) · [📙 Module 3: Functions and recursion](#module-3) · [📚 Free courses](#free-courses)
 
 ---
 
-<a id="module-2"></a>
+<a id="module-3"></a>
 <details open>
+<summary><h2>📙 Module 3: Modular Programming and Recursion</h2></summary>
+
+### ⭐ Start here
+
+| Class | Topics | Slides | Code |
+|---|---|---|---|
+| **Class 1: Build with Blocks** | Functions, declaration, definition, call and return | [Open slides (PDF)](https://github.com/sachugowda/CSE-1003-FoCP/blob/main/Module-3/class1/FoCP%20Module%203%20%C2%B7%20Class%201%20%E2%80%94%20Build%20with%20Blocks.pdf) | [Code](https://github.com/sachugowda/CSE-1003-FoCP/tree/main/Module-3/class1/code) |
+| **Class 2: Copy or Key?** | Call by value, call by reference, the stack (shown with a debugger), scope of variables, storage classes | [Open slides (PDF)](https://github.com/sachugowda/CSE-1003-FoCP/blob/main/Module-3/class2/FoCP%20Module%203%20%C2%B7%20Class%202%20%E2%80%94%20Copy%20or%20Key.pdf) | [Code](https://github.com/sachugowda/CSE-1003-FoCP/tree/main/Module-3/class2/code) |
+| **Class 3: The Function That Calls Itself** | Recursive functions, recursion versus iteration | [Open slides (PDF)](https://github.com/sachugowda/CSE-1003-FoCP/blob/main/Module-3/class3/FoCP%20Module%203%20%C2%B7%20Class%203%20%E2%80%94%20The%20Function%20That%20Calls%20Itself.pdf) | [Code](https://github.com/sachugowda/CSE-1003-FoCP/tree/main/Module-3/class3/code) |
+
+🧪 **[Play with Concepts](https://sachugowda.github.io/CSE-1003-FoCP/practice/module3-playground.html)**: predict it, run it, break it, fix it, for all three classes  ·  🤖 **Module 3 assistant:** coming soon
+
+### ▶️ Run the class programs in your browser
+
+Open a link, type any input in the input box, then press **Run**.
+
+**Class 1: Build with Blocks:** [bill_fn.c](https://onlinegdb.com/21VyCsqft) (Riya's bill built from functions)
+
+**Class 2: Copy or Key?:** [canteen_v2.c](https://onlinegdb.com/9kiVY7a9P) (value, reference, static and global in one program)
+
+**Class 3: The Function That Calls Itself:** [recursion_lab.c](https://onlinegdb.com/i-mooUt_Zq) (five small recursions) · [countdown.c](https://onlinegdb.com/xlqcZ3SEH) (change one line and predict the output)
+
+**Tip:** to watch a function call and the stack step by step, paste a program into [Python Tutor for C](https://pythontutor.com/c.html).
+
+### ✍️ Exam-style questions
+
+1. Write a function `int is_leap(int year)` that returns 1 for a leap year and 0 otherwise. In `main`, read a year and print "Leap year" or "Not a leap year".
+2. Explain call by value and call by reference. For `int a = 4, b = 9;`, write the `swap` function for each and show the values of `a` and `b` after the call.
+3. Write a function `void divide(int a, int b, int *q, int *r)` that stores the quotient and the remainder. Call it from `main` for 17 and 5.
+4. What is the difference between an `auto` and a `static` variable? Write a function that returns how many times it has been called, and show the output of three calls.
+5. Write a recursive function for the sum of the digits of a number. Trace it for 472 and show the calls on the stack. Write the loop version too, and say which uses more memory and why.
+
+**Check your work:** run your program with two or three different inputs, including a boundary value. For recursion, draw the stack on paper first.
+
+### 📚 Go deeper
+
+| Class | Read (W3Schools) | Watch |
+|---|---|---|
+| Class 1 | [C Functions](https://www.w3schools.com/c/c_functions.php) · [Function Parameters](https://www.w3schools.com/c/c_functions_parameters.php) · [Function Declaration](https://www.w3schools.com/c/c_functions_decl.php) | [NPTEL: Problem Solving through Programming in C](https://nptel.ac.in/courses/106105171) |
+| Class 2 | [Function Parameters](https://www.w3schools.com/c/c_functions_parameters.php) · [Scope](https://www.w3schools.com/c/c_scope.php) · [Storage Classes](https://www.w3schools.com/c/c_storage_classes.php) | [NPTEL: Problem Solving through Programming in C](https://nptel.ac.in/courses/106105171) |
+| Class 3 | [C Recursion](https://www.w3schools.com/c/c_functions_recursion.php) | [NPTEL: Problem Solving through Programming in C](https://nptel.ac.in/courses/106105171) |
+
+</details>
+
+<a id="module-2"></a>
+<details>
 <summary><h2>📗 Module 2: Basic Programming and Control Statements</h2></summary>
 
 ### ⭐ Start here
