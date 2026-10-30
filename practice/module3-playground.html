@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Play with Concepts: Module 3 · FoCP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bench: #EEF1F4;
+    --panel: #FFFFFF;
+    --line: #D3DAE3;
+    --ink: #14202E;
+    --muted: #5A6778;
+    --signal: #F2A900;
+    --signal-soft: #FFF3D1;
+    --wire: #1F5FBF;
+    --wire-soft: #E4ECF8;
+    --good: #1E7A50;
+    --good-soft: #E1F2E9;
+    --bad: #B8332A;
+    --bad-soft: #FAE5E3;
+    --sans: "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+    --mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bench);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 32px 20px 56px; }
+
+  header h1 { font-size: 30px; line-height: 1.2; margin: 0 0 6px; font-weight: 700; }
+  header p { margin: 0; color: var(--muted); }
+
+  .tabs { display: flex; gap: 6px; margin: 28px 0 0; border-bottom: 2px solid var(--line); flex-wrap: wrap; }
+  .tab {
+    font: 600 16px var(--sans); color: var(--muted);
+    background: none; border: none; padding: 10px 14px 12px; cursor: pointer;
+    border-bottom: 3px solid transparent; margin-bottom: -2px;
+  }
+  .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--wire); }
+  .tab:hover { color: var(--ink); }
+
+  .panel { background: var(--panel); border: 1px solid var(--line); border-top: none; border-radius: 0 0 10px 10px; padding: 26px 24px 28px; }
+  .panel[hidden] { display: none; }
+
+  .bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 22px; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .seg button { font: 500 15px var(--sans); border: none; background: var(--panel); color: var(--muted); padding: 7px 12px; cursor: pointer; }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .seg button[aria-pressed="true"] { background: var(--wire-soft); color: var(--wire); font-weight: 600; }
+  .score { font-size: 15px; color: var(--muted); }
+  .score b { color: var(--ink); }
+
+  .prompt { font-size: 19px; margin: 0 0 4px; }
+  .target { font: 600 64px/1.1 var(--mono); margin: 6px 0 22px; letter-spacing: 1px; }
+  .target small { font: 500 18px var(--sans); color: var(--muted); margin-left: 8px; letter-spacing: 0; }
+
+  /* switches: the one bold element */
+  .board { display: flex; gap: 8px; justify-content: flex-start; margin: 4px 0 8px; flex-wrap: nowrap; }
+  .sw { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 0 1 64px; min-width: 34px; }
+  .sw .bit { font: 600 18px var(--mono); color: var(--muted); }
+  .sw.on .bit { color: var(--ink); }
+  .toggle {
+    width: 100%; max-width: 54px; height: 92px; border-radius: 10px;
+    background: #2A3442; border: 2px solid #1A222D; position: relative; cursor: pointer; padding: 0;
+  }
+  .toggle::after {
+    content: ""; position: absolute; left: 6px; right: 6px; height: 38px; bottom: 6px;
+    border-radius: 7px; background: #5E6B7C; transition: bottom .15s ease, background .15s ease, box-shadow .15s ease;
+  }
+  .sw.on .toggle::after { bottom: 44px; background: var(--signal); box-shadow: 0 0 18px 4px rgba(242,169,0,.55); }
+  .toggle:disabled { cursor: default; }
+  .sw .w { font: 500 14px var(--mono); color: var(--muted); }
+  .live { font: 500 16px var(--mono); color: var(--muted); margin: 8px 0 18px; min-height: 24px; }
+
+  input[type="text"], input[type="number"] {
+    font: 600 26px var(--mono); width: 200px; padding: 8px 12px;
+    border: 2px solid var(--line); border-radius: 8px; color: var(--ink); background: var(--panel);
+  }
+  input:focus { outline: none; border-color: var(--wire); }
+
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 18px; }
+  .btn { font: 600 16px var(--sans); border-radius: 8px; padding: 10px 18px; cursor: pointer; border: 2px solid var(--wire); }
+  .btn.primary { background: var(--wire); color: #fff; }
+  .btn.ghost { background: var(--panel); color: var(--wire); }
+  .btn:disabled { opacity: .45; cursor: default; }
+
+  .feedback { margin-top: 18px; padding: 14px 16px; border-radius: 8px; display: none; }
+  .feedback.show { display: block; }
+  .feedback.ok { background: var(--good-soft); color: var(--good); }
+  .feedback.no { background: var(--bad-soft); color: var(--bad); }
+  .feedback p { margin: 4px 0 0; color: var(--ink); }
+  .feedback strong { font-size: 17px; }
+
+  pre {
+    background: #14202E; color: #E6EBF2; font: 15.5px/1.6 var(--mono);
+    padding: 16px 18px; border-radius: 8px; overflow-x: auto; margin: 10px 0 18px;
+  }
+  .task { color: var(--muted); margin: 0 0 4px; }
+  .choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+  .choice { font: 600 16px var(--sans); text-align: left; padding: 12px 14px; border-radius: 8px; border: 2px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+  .choice:hover:not(:disabled) { border-color: var(--wire); }
+  .choice.right { border-color: var(--good); background: var(--good-soft); color: var(--good); }
+  .choice.wrong { border-color: var(--bad); background: var(--bad-soft); color: var(--bad); }
+  .choice:disabled { cursor: default; }
+
+  table.trace { border-collapse: collapse; margin-top: 12px; font-family: var(--mono); font-size: 15px; }
+  table.trace th, table.trace td { border: 1px solid var(--line); padding: 5px 14px; text-align: right; }
+  table.trace th { background: var(--bench); font-weight: 600; }
+
+
+  .steps { display: flex; flex-direction: column; gap: 8px; }
+  .step { font: 500 16px var(--sans); text-align: left; padding: 10px 14px; border-radius: 8px; border: 2px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+  .step:hover:not(:disabled) { border-color: var(--wire); }
+  .step:disabled { opacity: .35; cursor: default; }
+  .fixed { padding: 8px 14px; border-radius: 8px; background: var(--bench); color: var(--muted); font-weight: 600; }
+  ol.mine { margin: 6px 0 0; padding-left: 26px; min-height: 30px; }
+  ol.mine li { padding: 5px 0; }
+  ol.mine li.right { color: var(--good); } ol.mine li.wrong { color: var(--bad); }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 620px) { .cols { grid-template-columns: 1fr; } }
+  .h3 { font-weight: 600; margin: 0 0 6px; }
+  .shape-choice { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+  .shape-choice svg { width: 96px; height: 52px; }
+  .statement { font: 600 26px var(--mono); margin: 8px 0 20px; padding: 14px 18px; background: var(--bench); border-radius: 8px; }
+
+  .help { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: var(--wire-soft); border: 1px solid var(--line); border-top: none; padding: 10px 16px; font-size: 15px; }
+  .help span:first-child { flex: 1 1 260px; }
+  .btn.small { padding: 6px 12px; font-size: 14px; text-decoration: none; display: inline-block; }
+  .copied { color: var(--good); font-weight: 600; }
+  .tip { margin-top: 26px; font-size: 15px; color: var(--muted); }
+  footer { margin-top: 28px; font-size: 14px; color: var(--muted); }
+
+  button:focus-visible, .tab:focus-visible, .toggle:focus-visible { outline: 3px solid var(--wire); outline-offset: 2px; }
+  @media (max-width: 520px) {
+    .target { font-size: 48px; }
+    .toggle { height: 78px; }
+    .toggle::after { height: 31px; }
+    .sw.on .toggle::after { bottom: 37px; }
+    .panel { padding: 22px 16px 24px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .toggle::after { transition: none; } }
+
+  .opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; margin-top: 6px; }
+  .opts .choice.mono { font-family: var(--mono); white-space: pre; }
+  .qtext { font-size: 19px; margin: 0 0 6px; }
+  .sub { color: var(--muted); font-size: 15px; margin: 0 0 4px; }
+  .tagline { font-style: italic; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Play with Concepts: Module 3</h1>
+    <p><span class="tagline">Predict it, run it, break it, fix it.</span> Functions and recursion, CSE-1003, IIIT Bhopal. Every question is new, so play as long as you like. Copy any code into OnlineGDB to see it run.</p>
+  </header>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" aria-controls="p-c1">Class 1: Functions</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-c2">Class 2: Copy, key and stack</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-c3">Class 3: Recursion</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-fix">Missing lines and bugs</button>
+  </div>
+  <div class="help" id="help">
+    <span>Stuck? Copy the question and ask the course assistant for a hint.</span>
+    <button class="btn ghost small" id="copy-q">Copy question</button>
+    <a class="btn primary small" id="ask-link" target="_blank" rel="noopener">Open assistant</a>
+    <span class="copied" id="copied" aria-live="polite"></span>
+  </div>
+
+  <section class="panel" id="p-c1" role="tabpanel">
+    <div class="bar"><div class="seg" aria-label="Practice type" style="flex-wrap:wrap"><button data-tab="c1" data-mode="ret" aria-pressed="true">What does it print?</button><button data-tab="c1" data-mode="part" aria-pressed="false">Declaration, definition or call?</button><button data-tab="c1" data-mode="shape" aria-pressed="false">Pick the shape</button></div><div class="score" id="s-c1"></div></div>
+    <div id="q-c1"></div>
+    <div class="feedback" id="fb-c1" aria-live="polite"></div>
+    <div class="actions"><button class="btn ghost" data-next="c1">Next question</button></div>
+  </section>
+
+  <section class="panel" id="p-c2" role="tabpanel" hidden>
+    <div class="bar"><div class="seg" aria-label="Practice type" style="flex-wrap:wrap"><button data-tab="c2" data-mode="val" aria-pressed="true">Copy or key?</button><button data-tab="c2" data-mode="stack" aria-pressed="false">Count the boxes</button><button data-tab="c2" data-mode="scope" aria-pressed="false">Who can see it?</button><button data-tab="c2" data-mode="stat" aria-pressed="false">auto or static?</button></div><div class="score" id="s-c2"></div></div>
+    <div id="q-c2"></div>
+    <div class="feedback" id="fb-c2" aria-live="polite"></div>
+    <div class="actions"><button class="btn ghost" data-next="c2">Next question</button></div>
+  </section>
+
+  <section class="panel" id="p-c3" role="tabpanel" hidden>
+    <div class="bar"><div class="seg" aria-label="Practice type" style="flex-wrap:wrap"><button data-tab="c3" data-mode="ret" aria-pressed="true">What does it return?</button><button data-tab="c3" data-mode="calls" aria-pressed="false">How many calls?</button><button data-tab="c3" data-mode="order" aria-pressed="false">Before or after?</button><button data-tab="c3" data-mode="diag" aria-pressed="false">What goes wrong?</button><button data-tab="c3" data-mode="fun" aria-pressed="false">Puzzles</button><button data-tab="c3" data-mode="vs" aria-pressed="false">Loop or recursion?</button></div><div class="score" id="s-c3"></div></div>
+    <div id="q-c3"></div>
+    <div class="feedback" id="fb-c3" aria-live="polite"></div>
+    <div class="actions"><button class="btn ghost" data-next="c3">Next question</button></div>
+  </section>
+
+  <section class="panel" id="p-fix" role="tabpanel" hidden>
+    <div class="bar"><div class="seg" aria-label="Practice type" style="flex-wrap:wrap"><button data-tab="fix" data-mode="miss" aria-pressed="true">Pick the missing line</button><button data-tab="fix" data-mode="bug" aria-pressed="false">Find the bug</button></div><div class="score" id="s-fix"></div></div>
+    <div id="q-fix"></div>
+    <div class="feedback" id="fb-fix" aria-live="polite"></div>
+    <div class="actions"><button class="btn ghost" data-next="fix">Next question</button></div>
+  </section>
+
+  <footer>CSE-1003 Fundamentals of Computer Programming, IIIT Bhopal</footer>
+</div>
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var R = function (a, b) { return a + Math.floor(Math.random() * (b - a + 1)); };
+  var pick = function (a) { return a[R(0, a.length - 1)]; };
+  var esc = function (s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); };
+  var shuffle = function (a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = R(0, i), t = a[i]; a[i] = a[j]; a[j] = t; } return a; };
+  var idiv = function (a, b) { return Math.trunc(a / b); };
+  var fmt = function (x) { return Math.abs(x - Math.round(x)) < 1e-9 ? String(Math.round(x)) : x.toFixed(2); };
+
+  /* ---------- scores ---------- */
+  var KEY = "focp-m3-best", scores = {};
+  ["c1", "c2", "c3", "fix"].forEach(function (k) { scores[k] = { r: 0, t: 0, s: 0, best: 0 }; });
+  try { var sv = JSON.parse(localStorage.getItem(KEY) || "{}"); Object.keys(sv).forEach(function (k) { if (scores[k]) scores[k].best = sv[k]; }); } catch (e) {}
+  function showScore(k) { var s = scores[k]; $("s-" + k).innerHTML = "Correct <b>" + s.r + "/" + s.t + "</b>, streak <b>" + s.s + "</b>, best <b>" + s.best + "</b>"; }
+  function record(k, ok) { var s = scores[k]; s.t++; if (ok) { s.r++; s.s++; } else s.s = 0;
+    if (s.s > s.best) { s.best = s.s; try { var b = {}; Object.keys(scores).forEach(function (x) { b[x] = scores[x].best; }); localStorage.setItem(KEY, JSON.stringify(b)); } catch (e) {} }
+    showScore(k); }
+  Object.keys(scores).forEach(showScore);
+
+  /* ---------- question renderer ----------
+     q = {text, code?, options? [strings], answer (string or number), numeric?: bool, tol?, mono?: bool, why} */
+  var cur = {};
+  function render(k, q) {
+    cur[k] = { q: q, done: false };
+    var h = '<p class="qtext">' + q.text + '</p>';
+    if (q.code) h += '<pre><code>' + esc(q.code) + '</code></pre>';
+    if (q.options) {
+      h += '<div class="opts">' + q.options.map(function (o, i) { return '<button class="choice' + (q.mono ? ' mono' : '') + '" data-i="' + i + '">' + esc(o) + '</button>'; }).join("") + '</div>';
+    } else {
+      h += '<label class="task" for="in-' + k + '">Your answer</label><br><input type="' + (q.numeric ? "number" : "text") + '" step="any" id="in-' + k + '" autocomplete="off">' +
+           '<div class="actions"><button class="btn primary" id="chk-' + k + '">Check</button></div>';
+    }
+    $("q-" + k).innerHTML = h; $("fb-" + k).className = "feedback"; $("fb-" + k).innerHTML = "";
+    if (q.options) {
+      $("q-" + k).querySelectorAll(".choice").forEach(function (b) { b.addEventListener("click", function () {
+        if (cur[k].done) return; cur[k].done = true; var i = +b.dataset.i, ok = q.options[i] === q.answer;
+        $("q-" + k).querySelectorAll(".choice").forEach(function (x) { x.disabled = true; var oi = +x.dataset.i;
+          if (q.options[oi] === q.answer) x.classList.add("right"); else if (oi === i) x.classList.add("wrong"); });
+        finish(k, ok); }); });
+    } else {
+      var go = function () { if (cur[k].done) return; var v = $("in-" + k).value.trim(); if (v === "") { fb(k, false, "Type your answer first.", ""); return; }
+        var ok;
+        if (q.numeric) ok = Math.abs(parseFloat(v) - q.answer) <= (q.tol || 1e-9);
+        else ok = v.replace(/\s+/g, " ").toLowerCase() === String(q.answer).replace(/\s+/g, " ").toLowerCase();
+        cur[k].done = true; $("chk-" + k).disabled = true; finish(k, ok); };
+      $("chk-" + k).addEventListener("click", go);
+      $("in-" + k).addEventListener("keydown", function (e) { if (e.key === "Enter") go(); });
+    }
+  }
+  function fb(k, ok, title, body) { var f = $("fb-" + k); f.className = "feedback show " + (ok ? "ok" : "no"); f.innerHTML = "<strong>" + title + "</strong>" + (body ? "<p>" + body + "</p>" : ""); }
+  function finish(k, ok) { var q = cur[k].q; record(k, ok);
+    var shown = q.numeric ? fmt(q.answer) : q.answer;
+    fb(k, ok, ok ? "Correct: " + esc(shown) + "." : "The answer is " + esc(shown) + ".", q.why); }
+
+    /* ---------- helpers for Module 3 ---------- */
+  function wrap(fn, body) { return "#include <stdio.h>\n\n" + fn + "\n\nint main(void) {\n" + body.split("\n").map(function (l) { return "    " + l; }).join("\n") + "\n    return 0;\n}\n"; }
+  function seqOpts(correct, others) { var all = [correct]; others.forEach(function (o) { if (all.indexOf(o) < 0) all.push(o); }); return shuffle(all.slice(0, 4)); }
+
+  /* ---------- Class 1: functions ---------- */
+  var DEFNAMES = ["cube", "half", "twice", "bonus", "square", "triple"];
+  var C1 = {
+    ret: function () {
+      var t = R(0, 6), a = R(2, 9), b = R(2, 9), x;
+      if (t === 0) x = { fn: "int perimeter(int l, int w) {\n    return 2 * (l + w);\n}", call: 'printf("%d", perimeter(' + a + ", " + b + "));", ans: 2 * (a + b), why: "The function returns 2 × (" + a + " + " + b + ") = " + 2 * (a + b) + "." };
+      else if (t === 1) { a = R(2, 5); x = { fn: "int cube(int n) {\n    return n * n * n;\n}", call: 'printf("%d", cube(' + a + ") + " + b + ");", ans: a * a * a + b, why: "cube(" + a + ") returns " + a * a * a + ", then " + b + " is added." }; }
+      else if (t === 2) { if ((a + b) % 2 === 0) b++; x = { fn: "int avg2(int a, int b) {\n    return (a + b) / 2;\n}", call: 'printf("%d", avg2(' + a + ", " + b + "));", ans: idiv(a + b, 2), why: "(" + a + " + " + b + ") is " + (a + b) + "; int division by 2 drops the decimal part, giving " + idiv(a + b, 2) + "." }; }
+      else if (t === 3) { var bill = R(11, 99); x = { fn: "int tip(int bill) {\n    return bill / 10;\n}", call: 'printf("%d", bill + tip(bill));'.replace(/bill/g, "BILL"), ans: bill + idiv(bill, 10), why: "tip(" + bill + ") returns " + idiv(bill, 10) + " (int division), so the total is " + (bill + idiv(bill, 10)) + "." }; x.call = 'printf("%d", ' + bill + " + tip(" + bill + "));"; }
+      else if (t === 4) x = { fn: "int twice(int x) {\n    return x * 2;\n}", call: 'printf("%d", twice(twice(' + a + ")));", ans: a * 4, why: "The inner call gives " + a * 2 + ", the outer call doubles it again: " + a * 4 + "." };
+      else if (t === 5) { var n = R(-9, 9); x = { fn: "int sign(int n) {\n    if (n > 0) return 1;\n    if (n < 0) return -1;\n    return 0;\n}", call: 'printf("%d", sign(' + n + "));", ans: n > 0 ? 1 : (n < 0 ? -1 : 0), why: "return ends the function at the first condition that is true." }; }
+      else x = { fn: "int f(int x) {\n    return x + 1;\n    printf(\"done\");\n}", call: 'printf("%d", f(' + a + "));", ans: a + 1, why: "return ends the function at once, so printf(\"done\") never runs." };
+      return { text: "What does this program print?", code: x.fn + "\n\n" + x.call, numeric: true, answer: x.ans, why: esc(x.why), prog: wrap(x.fn, x.call), out: String(x.ans) };
+    },
+    part: function () {
+      var nm = pick(DEFNAMES), k = R(2, 5), t = R(0, 5), code, ans, why;
+      if (t === 0) { code = "int " + nm + "(int n);"; ans = "Declaration (prototype)"; why = "It ends with a semicolon and has no body: it only announces the function."; }
+      else if (t === 1) { code = "int " + nm + "(int n) {\n    return n * " + k + ";\n}"; ans = "Definition"; why = "It has a body in braces: the full recipe of the function."; }
+      else if (t === 2) { code = "r = " + nm + "(" + k + ");"; ans = "Call"; why = "There is no return type in front and no body: this line uses the function."; }
+      else if (t === 3) { code = "void " + nm + "(void);"; ans = "Declaration (prototype)"; why = "A header ending with ; and no body is a prototype."; }
+      else if (t === 4) { code = "void " + nm + "(void) {\n    printf(\"Hi\");\n}"; ans = "Definition"; why = "The braces hold the body, so this is the definition."; }
+      else { code = "printf(\"%d\", " + nm + "(" + k + "));"; ans = "Call"; why = esc(nm) + "(" + k + ") inside printf calls the function and prints its returned value."; }
+      return { text: "Is this a declaration, a definition or a call?", code: code, options: ["Declaration (prototype)", "Definition", "Call"], answer: ans, why: esc(why) };
+    },
+    shape: function () {
+      var S = [["void hello(void)", 0], ["void show(int n)", 1], ["int read_age(void)", 2], ["int twice(int x)", 3], ["float half(float x)", 3], ["void line(void)", 0], ["void print_bill(int total)", 1], ["int roll_dice(void)", 2], ["int total(int a, int b, int c)", 3], ["char grade(float avg)", 3]];
+      var O = ["Nothing in, nothing out", "Something in, nothing out", "Nothing in, something out", "Something in, something out"], x = pick(S);
+      return { text: "Which shape does this function have?", code: x[0], options: O, answer: O[x[1]], why: esc("void before the name means nothing comes back; void (or empty) in the brackets means nothing goes in.") };
+    }
+  };
+
+  /* ---------- Class 2: copy, key, stack, scope, storage ---------- */
+  var NM = ["a", "b", "c", "d", "e"];
+  var C2 = {
+    val: function () {
+      var ref = Math.random() < 0.5;
+      if (Math.random() < 0.65) {
+        var op = pick(["+", "*", "-"]), K = R(2, 5), A = R(3, 12), nv = op === "+" ? A + K : op === "*" ? A * K : A - K;
+        var fn = ref ? "void bump(int *n) {\n    *n = *n " + op + " " + K + ";\n}" : "void bump(int n) {\n    n = n " + op + " " + K + ";\n}";
+        var body = "int x = " + A + ";\nbump(" + (ref ? "&x" : "x") + ");\nprintf(\"%d\", x);";
+        return { text: "What does the program print?", code: fn + "\n\n" + body, numeric: true, answer: ref ? nv : A, prog: wrap(fn, body), out: String(ref ? nv : A),
+          why: esc(ref ? "bump receives the ADDRESS of x, so *n changes x itself: " + A + " " + op + " " + K + " = " + nv + "." : "bump receives a COPY of x. The copy changes, but x stays " + A + ".") };
+      }
+      var A2 = R(2, 9), B2 = R(2, 9); if (B2 === A2) B2 = A2 + 1;
+      var fn2 = ref ? "void swap(int *p, int *q) {\n    int t = *p;\n    *p = *q;\n    *q = t;\n}" : "void swap(int p, int q) {\n    int t = p;\n    p = q;\n    q = t;\n}";
+      var body2 = "int a = " + A2 + ", b = " + B2 + ";\nswap(" + (ref ? "&a, &b" : "a, b") + ");\nprintf(\"%d %d\", a, b);";
+      var ans2 = ref ? B2 + " " + A2 : A2 + " " + B2;
+      return { text: "What does the program print?", code: fn2 + "\n\n" + body2, options: seqOpts(ans2, [ref ? A2 + " " + B2 : B2 + " " + A2, A2 + " " + A2, B2 + " " + B2]), mono: true, answer: ans2, prog: wrap(fn2, body2), out: ans2,
+        why: esc(ref ? "swap gets the addresses of a and b, so it swaps the real variables." : "swap gets copies of a and b. It swaps the copies, and a and b are unchanged.") };
+    },
+    stack: function () {
+      var t = R(0, 2), code, ans, why;
+      if (t === 0) { var d = R(1, 4), fs = NM.slice(0, d), lines = [];
+        for (var i = d - 1; i >= 0; i--) lines.push("void " + fs[i] + "(void) { " + (i === d - 1 ? "printf(\"hi\");" : fs[i + 1] + "();") + " }");
+        code = lines.join("\n") + "\nint main(void) { " + fs[0] + "(); return 0; }"; ans = d + 1; why = "main calls " + fs.join(", which calls ") + ": " + (d + 1) + " boxes at the deepest point, counting main."; }
+      else if (t === 1) { var m = R(2, 4); code = "void a(void) { printf(\"a\"); }\nvoid b(void) { printf(\"b\"); }\nint main(void) {\n" + Array(m + 1).join("    a();\n    b();\n").split("\n").slice(0, m * 2).join("\n") + "\n    return 0;\n}"; ans = 2; why = "The calls come one after another. Each box is removed before the next call, so the stack is never more than 2 deep (main and one function)."; }
+      else { code = "void c(void) { printf(\"c\"); }\nvoid b(void) { printf(\"b\"); }\nvoid a(void) {\n    b();\n    c();\n}\nint main(void) { a(); return 0; }"; ans = 3; why = "main calls a, and a calls b, then c. b is finished before c starts, so the deepest point is main, a and one of them: 3 boxes."; }
+      return { text: "How many boxes are on the stack at the deepest point? (Count main.)", code: code, numeric: true, answer: ans, why: esc(why) };
+    },
+    scope: function () {
+      var t = R(0, 2), A = R(2, 9), B = R(2, 9), K = R(1, 5); if (B === A) B++;
+      if (t === 0) { var fn = "int g = " + A + ";\n\nvoid f(void) {\n    int g = " + B + ";\n    g = g + " + K + ";\n    printf(\"%d \", g);\n}", body = "f();\nprintf(\"%d\", g);", ans = (B + K) + " " + A;
+        return { text: "What does the program print?", code: fn + "\n\nint main(void) {\n    f();\n    printf(\"%d\", g);\n    return 0;\n}", options: seqOpts(ans, [(A + K) + " " + A, (B + K) + " " + (B + K), (A + K) + " " + (A + K)]), mono: true, answer: ans, prog: wrap(fn, body), out: ans, why: esc("The local g hides the global g inside f: it becomes " + (B + K) + ". The global g is untouched: still " + A + ".") }; }
+      if (t === 1) { var fn1 = "int g = " + A + ";\n\nvoid f(void) {\n    g = g + " + K + ";\n    printf(\"%d \", g);\n}", body1 = "f();\nprintf(\"%d\", g);", ans1 = (A + K) + " " + (A + K);
+        return { text: "What does the program print?", code: fn1 + "\n\nint main(void) {\n    f();\n    printf(\"%d\", g);\n    return 0;\n}", options: seqOpts(ans1, [(A + K) + " " + A, A + " " + A, A + " " + (A + K)]), mono: true, answer: ans1, prog: wrap(fn1, body1), out: ans1, why: esc("There is no local g, so f changes the GLOBAL g. Both prints show " + (A + K) + ".") }; }
+      var nm = pick(["t", "count", "temp", "x"]), pos = R(0, 1);
+      var code = "1  void f(void) {\n2      int " + nm + " = " + A + ";\n3  }\n4  int main(void) {\n5      f();\n6      printf(\"%d\", " + nm + ");\n7  }";
+      var opts = []; for (var i = 1; i <= 7; i++) opts.push("Line " + i);
+      return { text: "Which line gives a compile error?", code: code, options: opts, answer: "Line 6", why: esc(nm + " is local to f. main cannot see it, so line 6 fails.") };
+    },
+    stat: function () {
+      var isStatic = Math.random() < 0.5, S = R(1, 6), K = R(1, 4);
+      var fn = "int next(void) {\n    " + (isStatic ? "static " : "") + "int c = " + S + ";\n    c = c + " + K + ";\n    return c;\n}";
+      var body = "int a = next();\nint b = next();\nint c = next();\nprintf(\"%d %d %d\", a, b, c);";
+      var st = [S + K, S + 2 * K, S + 3 * K].join(" "), au = [S + K, S + K, S + K].join(" "), ans = isStatic ? st : au;
+      return { text: "next() is called three times. What is printed?", code: fn + "\n\n" + body, options: seqOpts(ans, [isStatic ? au : st, [S, S, S].join(" "), [S + K, S + K, S + 2 * K].join(" ")]), mono: true, answer: ans, prog: wrap(fn, body), out: ans,
+        why: esc(isStatic ? "static c is created once and keeps its value: " + st + "." : "A plain c is created again on every call, starting at " + S + ": every call returns " + (S + K) + ".") };
+    }
+  };
+
+  /* ---------- Class 3: recursion ---------- */
+  function ones(n) { return n === 0 ? 0 : n % 2 + ones(idiv(n, 2)); }
+  function digitsOf(n) { return n < 10 ? 1 : 1 + digitsOf(idiv(n, 10)); }
+  function evens(n) { return n <= 0 ? 0 : (n % 2 === 0 ? n + evens(n - 2) : evens(n - 1)); }
+  var C3 = {
+    ret: function () {
+      var t = R(0, 3), fn, call, ans, why;
+      if (t === 0) { var n = R(3, 31); fn = "int ones(int n) {\n    if (n == 0) return 0;\n    return n % 2 + ones(n / 2);\n}"; call = "printf(\"%d\", ones(" + n + "));"; ans = ones(n); why = "It counts the 1s in the binary form of " + n + " (the last bit each time, then n / 2): " + ans + "."; }
+      else if (t === 1) { var m = pick([R(5, 99), R(100, 999), R(1000, 99999)]); fn = "int digits(int n) {\n    if (n < 10) return 1;\n    return 1 + digits(n / 10);\n}"; call = "printf(\"%d\", digits(" + m + "));"; ans = digitsOf(m); why = "Each call removes one digit with n / 10, and adds 1. " + m + " has " + ans + " digits."; }
+      else if (t === 2) { var a = R(2, 9), b = R(2, 6); fn = "int mul(int a, int b) {\n    if (b == 0) return 0;\n    return a + mul(a, b - 1);\n}"; call = "printf(\"%d\", mul(" + a + ", " + b + "));"; ans = a * b; why = "It adds " + a + " a total of " + b + " times: " + a + " × " + b + " = " + ans + "."; }
+      else { var e = R(3, 10); fn = "int evens(int n) {\n    if (n <= 0) return 0;\n    if (n % 2 == 0) return n + evens(n - 2);\n    return evens(n - 1);\n}"; call = "printf(\"%d\", evens(" + e + "));"; ans = evens(e); why = "It adds the even numbers up to " + e + ": " + ans + "."; }
+      return { text: "What does the program print?", code: fn + "\n\n" + call, numeric: true, answer: ans, prog: wrap(fn, call), out: String(ans), why: esc(why) };
+    },
+    calls: function () {
+      var t = R(0, 2), fn, text, ans, why, prog;
+      if (t === 0) { var n = R(2, 9); fn = "int f(int n) {\n    if (n == 0) return 0;\n    return 1 + f(n - 1);\n}"; text = "How many times is f called by f(" + n + ")? Count the first call too."; ans = n + 1; why = "f(" + n + "), f(" + (n - 1) + ") ... f(0): " + ans + " calls.";
+        prog = "#include <stdio.h>\nint calls = 0;\nint f(int n) {\n    calls++;\n    if (n == 0) return 0;\n    return 1 + f(n - 1);\n}\nint main(void) {\n    f(" + n + ");\n    printf(\"%d\", calls);\n    return 0;\n}\n"; }
+      else if (t === 1) { var m = R(1, 40), c = 0, x = m; while (true) { c++; if (x === 0) break; x = idiv(x, 2); } fn = "int g(int n) {\n    if (n == 0) return 0;\n    return 1 + g(n / 2);\n}"; text = "How many times is g called by g(" + m + ")? Count the first call too."; ans = c; why = "n is halved each time: " + (function () { var a = [], y = m; while (true) { a.push(y); if (y === 0) break; y = idiv(y, 2); } return a.join(", "); })() + ". That is " + c + " calls.";
+        prog = "#include <stdio.h>\nint calls = 0;\nint g(int n) {\n    calls++;\n    if (n == 0) return 0;\n    return 1 + g(n / 2);\n}\nint main(void) {\n    g(" + m + ");\n    printf(\"%d\", calls);\n    return 0;\n}\n"; }
+      else { var k = R(2, 6), cc = [1, 1]; for (var i = 2; i <= k; i++) cc[i] = 1 + cc[i - 1] + cc[i - 2]; fn = "int h(int n) {\n    if (n <= 1) return 1;\n    return h(n - 1) + h(n - 2);\n}"; text = "How many times is h called by h(" + k + ")? Count the first call too."; ans = cc[k]; why = "Every call except the base cases makes TWO more calls, like a tree. h(" + k + ") makes " + ans + " calls in all.";
+        prog = "#include <stdio.h>\nint calls = 0;\nint h(int n) {\n    calls++;\n    if (n <= 1) return 1;\n    return h(n - 1) + h(n - 2);\n}\nint main(void) {\n    h(" + k + ");\n    printf(\"%d\", calls);\n    return 0;\n}\n"; }
+      return { text: text, code: fn, numeric: true, answer: ans, why: esc(why), prog: prog, out: String(ans) };
+    },
+    order: function () {
+      var n = R(2, 5), t = R(0, 2), pre = "    printf(\"%d \", n);\n", post = "    printf(\"%d \", n);\n";
+      var body = t === 0 ? pre + "    show(n - 1);\n" : t === 1 ? "    show(n - 1);\n" + post : pre + "    show(n - 1);\n" + post;
+      var fn = "void show(int n) {\n    if (n == 0)\n        return;\n" + body + "}";
+      var down = [], up = []; for (var i = n; i >= 1; i--) down.push(i); for (i = 1; i <= n; i++) up.push(i);
+      var ds = down.join(" "), us = up.join(" "), ans = t === 0 ? ds : t === 1 ? us : ds + " " + us;
+      var opts = seqOpts(ans, [ds, us, ds + " " + us, us + " " + ds]);
+      var why = t === 0 ? "The print is BEFORE the recursive call, so it happens on the way down: " + ds + "." : t === 1 ? "The print is AFTER the recursive call, so it happens on the way back: " + us + "." : "One print on the way down, one on the way back: " + ans + ".";
+      return { text: "What does show(" + n + ") print?", code: fn, options: opts, mono: true, answer: ans, why: esc(why), prog: wrap(fn, "show(" + n + ");"), out: ans };
+    },
+    diag: function () {
+      var L = ["Stack overflow: no base case", "Stack overflow: it never gets smaller", "Wrong answer: wrong base value", "Works correctly"];
+      var D = [["int sum(int n) {\n    return n + sum(n - 1);\n}", 0, "There is no if, so nothing stops the calls."],
+        ["int fact(int n) {\n    if (n == 1) return 1;\n    return n * fact(n);\n}", 1, "It calls fact(n), not fact(n - 1): n never gets closer to 1."],
+        ["int power(int b, int e) {\n    if (e == 0) return 0;\n    return b * power(b, e - 1);\n}", 2, "Anything to the power 0 is 1, not 0. The base case returns 0, so every answer is 0."],
+        ["int sum(int n) {\n    if (n == 0) return 0;\n    return n + sum(n - 1);\n}", 3, "It has a base case and every call gets smaller."],
+        ["int count_digits(int n) {\n    if (n < 10) return 1;\n    return 1 + count_digits(n / 10);\n}", 3, "n / 10 shrinks toward the base case n < 10."],
+        ["int steps(int n) {\n    if (n == 0) return 0;\n    return 1 + steps(n + 1);\n}", 1, "n + 1 moves AWAY from 0, so the base case is never reached."],
+        ["void down(int n) {\n    printf(\"%d \", n);\n    down(n - 1);\n}", 0, "There is no base case: it prints and calls itself forever."],
+        ["int total(int n) {\n    if (n == 1) return 0;\n    return n + total(n - 1);\n}", 2, "The base case should return 1 for this sum from 1 to n; returning 0 makes every answer 1 too small."]];
+      var x = pick(D); return { text: "What happens when this function is called with a positive number?", code: x[0], options: L, answer: L[x[1]], why: esc(x[2]) };
+    },
+    fun: function () {
+      var t = R(0, 2);
+      if (t === 0) { var k = R(2, 6), teams = Math.pow(2, k), parts = [], x = teams; while (x > 1) { parts.push(x / 2); x = x / 2; }
+        return { text: "A knockout cricket tournament starts with <b>" + teams + "</b> teams. In every match one team wins and moves on, and the other is out. How many matches are played in all, until there is one champion?", numeric: true, answer: teams - 1,
+          why: "Each round is the same problem with half the teams: " + parts.join(" + ") + " = " + (teams - 1) + " matches. (Every match knocks out exactly one team, and " + (teams - 1) + " teams must go out.)",
+          prog: "#include <stdio.h>\nint matches(int n) { return n == 1 ? 0 : n / 2 + matches(n / 2); }\nint main(void) { printf(\"%d\", matches(" + teams + ")); return 0; }\n", out: String(teams - 1) }; }
+      if (t === 1) { var r = R(1, 6), tot = Math.pow(2, r + 1) - 1, line = ["1"], i; for (i = 1; i <= r; i++) line.push(String(Math.pow(2, i)));
+        return { text: "One student tells a message to <b>2</b> friends. In the next round each of them tells 2 NEW friends, and so on. After <b>" + r + "</b> round" + (r > 1 ? "s" : "") + ", how many students know the message, counting the first student?", numeric: true, answer: tot,
+          why: "total(r) = total(r − 1) + 2^r. Here: " + line.join(" + ") + " = " + tot + ".",
+          prog: "#include <stdio.h>\nint pw(int n) { return n == 0 ? 1 : 2 * pw(n - 1); }\nint total(int r) { return r == 0 ? 1 : total(r - 1) + pw(r); }\nint main(void) { printf(\"%d\", total(" + r + ")); return 0; }\n", out: String(tot) }; }
+      var f = R(2, 8);
+      return { text: "A sheet of paper is folded in half <b>" + f + "</b> times, one fold after another. How many layers of paper are stacked at the end?", numeric: true, answer: Math.pow(2, f),
+        why: "layers(n) = 2 × layers(n − 1), with layers(0) = 1. Each fold doubles the layers: 2^" + f + " = " + Math.pow(2, f) + ".",
+        prog: "#include <stdio.h>\nint layers(int n) { return n == 0 ? 1 : 2 * layers(n - 1); }\nint main(void) { printf(\"%d\", layers(" + f + ")); return 0; }\n", out: String(Math.pow(2, f)) };
+    },
+    vs: function () {
+      var Q = [["Which uses more stack memory for n = 1000: a loop or a recursion that does the same job?", ["Recursion", "The loop", "Both the same"], "Recursion", "Every call gets its own box on the stack, so 1000 calls need about 1000 boxes. A loop reuses one set of variables."],
+        ["You must count all the files in folders inside folders. Which is the natural choice?", ["Recursion", "A loop with a counter only", "printf"], "Recursion", "Each subfolder is a smaller copy of the same problem."],
+        ["You must print the numbers 1 to 100. Which is the simplest choice?", ["A loop", "Recursion with two base cases", "Recursion with a global array"], "A loop", "A plain loop says it clearly and costs nothing extra."],
+        ["Which of these can cause a stack overflow?", ["Recursion with no base case", "A for loop that runs 1000 times", "A function with 3 parameters", "printf"], "Recursion with no base case", "The calls never stop, so the stack fills up."],
+        ["A function calls itself TWICE in each call, like ways(n − 1) + ways(n − 2). How does the number of calls grow as n grows?", ["Very fast", "By 1 each time", "It stays the same", "It becomes zero"], "Very fast", "The calls branch like a tree, so the number of calls roughly doubles with every extra step."],
+        ["Anything a recursion can do, a loop can do too. True or false?", ["True", "False"], "True", "A loop may be longer or harder to write, but it can always do the job."]];
+      var x = pick(Q); return { text: x[0], options: shuffle(x[1]), answer: x[2], why: esc(x[3]) };
+    }
+  };
+
+  /* ---------- Missing lines and bugs ---------- */
+  var MISS = [
+    { code: "int cube(int n) {\n    ______\n}", opts: ["return n * n * n;", "n * n * n;", "print n * n * n;", "return;"], ans: "return n * n * n;", why: "return sends the answer back to the caller." },
+    { code: "______\nint main(void) {\n    printf(\"%d\", twice(4));\n    return 0;\n}\nint twice(int x) { return x * 2; }", opts: ["int twice(int x);", "twice(int x);", "int twice;", "void twice();"], ans: "int twice(int x);", why: "The prototype announces the function before main uses it, and ends with a semicolon." },
+    { code: "void bump(int *n) { *n = *n + 1; }\nint x = 5;\n______\nprintf(\"%d\", x);   /* should print 6 */", opts: ["bump(&x);", "bump(x);", "bump(*x);", "&bump(x);"], ans: "bump(&x);", why: "A function that wants an address needs &x: the key to x's box." },
+    { code: "void bump(int *n) {\n    ______\n}", opts: ["*n = *n + 1;", "n = n + 1;", "&n = &n + 1;", "n + 1;"], ans: "*n = *n + 1;", why: "*n reaches the box n points to. Without the star, only the address changes." },
+    { code: "int count(void) {\n    ______\n    c++;\n    return c;\n}   /* must remember c between calls */", opts: ["static int c = 0;", "int c = 0;", "register int c;", "c = 0;"], ans: "static int c = 0;", why: "static keeps one box for the whole program, created once." },
+    { code: "int total(int n) {\n    ______\n    return n + total(n - 1);\n}", opts: ["if (n == 0) return 0;", "if (n == 0) return 1;", "return total(n);", "if (n > 0) return 0;"], ans: "if (n == 0) return 0;", why: "The base case stops the calls, and 0 is the sum of nothing." },
+    { code: "int power2(int n) {\n    if (n == 0) return 1;\n    ______\n}", opts: ["return 2 * power2(n - 1);", "return 2 * power2(n);", "return power2(n - 1);", "return 2 + power2(n - 1);"], ans: "return 2 * power2(n - 1);", why: "Each call multiplies by 2 and asks a SMALLER problem: n − 1." },
+    { code: "void swap(int *p, int *q) {\n    int t = *p;\n    ______\n    *q = t;\n}", opts: ["*p = *q;", "p = q;", "*p = t;", "t = *q;"], ans: "*p = *q;", why: "t saved *p. Now copy *q into *p, then put t into *q." }];
+  var BUGS = [
+    { code: "1  int area(int l, int w) {\n2      return l * w;\n3  }\n4  int main(void) {\n5      printf(\"%d\", area(4));\n6  }", ans: "Line 5", why: "area needs two arguments, but the call gives only one." },
+    { code: "1  void inc(int *n) { *n = *n + 1; }\n2  int main(void) {\n3      int a = 5;\n4      inc(a);\n5      printf(\"%d\", a);\n6  }", ans: "Line 4", why: "inc wants an address. Call inc(&a)." },
+    { code: "1  int twice(int x);\n2  {\n3      return x * 2;\n4  }", ans: "Line 1", why: "A semicolon after the header makes it a prototype, so the body has no function to belong to." },
+    { code: "1  int fact(int n) {\n2      if (n == 1) return 1;\n3      return n * fact(n);\n4  }", ans: "Line 3", why: "fact(n) never gets smaller. Use fact(n - 1)." },
+    { code: "1  int sum(int n) {\n2      if (n == 0) return 1;\n3      return n + sum(n - 1);\n4  }", ans: "Line 2", why: "The sum of nothing is 0, so the base case should return 0." },
+    { code: "1  int next(void) {\n2      int c = 0;   /* must remember */\n3      c++;\n4      return c;\n5  }", ans: "Line 2", why: "A plain local is created again on every call. It must be static to remember." },
+    { code: "1  void f(void) {\n2      int t = 5;\n3  }\n4  int main(void) {\n5      f();\n6      printf(\"%d\", t);\n7  }", ans: "Line 6", why: "t belongs to f. main cannot see it." },
+    { code: "1  int square(int n) {\n2      n * n;\n3  }\n4  int main(void) {\n5      printf(\"%d\", square(5));\n6  }", ans: "Line 2", why: "n * n is calculated and thrown away. Write return n * n;" }];
+  var FIX = {
+    miss: function () { var x = pick(MISS); return { text: "Which line goes in the blank?", code: x.code, options: shuffle(x.opts), mono: true, answer: x.ans, why: esc(x.why) }; },
+    bug: function () { var x = pick(BUGS); var n = x.code.split("\n").length, opts = []; for (var i = 1; i <= n; i++) opts.push("Line " + i);
+      return { text: "Which line has the bug?", code: x.code, options: opts, answer: x.ans, why: esc(x.why) }; }
+  };
+  var GEN = { c1: C1, c2: C2, c3: C3, fix: FIX }, MODE = { c1: "ret", c2: "val", c3: "ret", fix: "miss" }, last = {};
+  function next(k) { var g = GEN[k][MODE[k]]; var q, tries = 0; do { q = g(); tries++; } while (tries < 5 && last[k] && q.code === last[k].code && q.text === last[k].text); last[k] = q; render(k, q); }
+  document.querySelectorAll("[data-mode]").forEach(function (b) { b.addEventListener("click", function () {
+    var k = b.dataset.tab; MODE[k] = b.dataset.mode;
+    document.querySelectorAll('[data-tab="' + k + '"]').forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+    next(k); }); });
+  document.querySelectorAll("[data-next]").forEach(function (b) { b.addEventListener("click", function () { next(b.dataset.next); }); });
+  /* tabs */
+  var tabs = document.querySelectorAll(".tab");
+  tabs.forEach(function (t) { t.addEventListener("click", function () { tabs.forEach(function (x) { x.setAttribute("aria-selected", x === t ? "true" : "false"); $(x.getAttribute("aria-controls")).hidden = x !== t; }); }); });
+  /* ask the assistant */
+  var ASSISTANT_URL = "";   /* paste the Module 3 NotebookLM link here when it is ready */
+  if (ASSISTANT_URL) $("ask-link").href = ASSISTANT_URL; else $("ask-link").style.display = "none";
+  $("copy-q").addEventListener("click", function () {
+    var p = document.querySelector(".panel:not([hidden])"), tab = document.querySelector('.tab[aria-selected="true"]').textContent;
+    var k = p.id.replace("p-", ""), q = cur[k] && cur[k].q;
+    var text = "FoCP Module 3, Play with Concepts, " + tab + ":\n\n" + (q ? q.text.replace(/<[^>]+>/g, " ") + (q.code ? "\n\n" + q.code : "") + (q.options ? "\n\nOptions: " + q.options.join(" | ") : "") : "") + "\n\nI'm stuck. Please give me a hint, not the full answer.";
+    function done() { $("copied").textContent = "Copied"; setTimeout(function () { $("copied").textContent = ""; }, 2000); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fb2); else fb2();
+    function fb2() { var ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); done(); } catch (e) {} document.body.removeChild(ta); }
+  });
+  ["c1", "c2", "c3", "fix"].forEach(next);
+  window.__GEN = GEN;
+})();
+</script>
+</body>
+</html>
