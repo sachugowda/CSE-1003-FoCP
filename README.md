@@ -9,9 +9,55 @@ Course resources for B.Tech first-year students, IIIT Bhopal.
 🌐 **Course website:** <https://sachugowda.github.io/CSE-1003-FoCP/><br>
 Slides, practice, the course assistant and resources for every module in one place. Works best on phones.
 
-**Jump to:** [📘 Module 1: Fundamentals](#module-1) · [📗 Module 2: Control statements](#module-2) · [📙 Module 3: Functions and recursion](#module-3) · [📚 Free courses](#free-courses)
+**Jump to:** [📘 Module 1: Fundamentals](#module-1) · [📗 Module 2: Control statements](#module-2) · [📙 Module 3: Functions and recursion](#module-3) · [📕 Module 4: Arrays and strings](#module-4) · [📚 Free courses](#free-courses)
 
 ---
+
+<a id="module-4"></a>
+<details open>
+<summary><h2>📕 Module 4: Arrays and Strings</h2></summary>
+
+### ⭐ Start here
+
+| Class | Topics | Slides | Code |
+|---|---|---|---|
+| **Class 1: Many Boxes, One Name** | Arrays: declare, fill, read and traverse one-dimensional arrays; a first look at two-dimensional arrays | [Open slides (PDF)](https://github.com/sachugowda/CSE-1003-FoCP/blob/main/Module-4/class1/FoCP%20Module%204%20%C2%B7%20Class%201%20%E2%80%94%20Many%20Boxes%2C%20One%20Name.pdf) | [Code](https://github.com/sachugowda/CSE-1003-FoCP/tree/main/Module-4/class1/code) |
+| **Class 2: Shift, Search and Share** | Insert and delete in an array, linear and binary search, merging sorted arrays, passing arrays to functions | [Open slides (PDF)](https://github.com/sachugowda/CSE-1003-FoCP/blob/main/Module-4/class2/FoCP%20Module%204%20%C2%B7%20Class%202%20%E2%80%94%20Shift%2C%20Search%20and%20Share.pdf) | [Code](https://github.com/sachugowda/CSE-1003-FoCP/tree/main/Module-4/class2/code) |
+| **Class 3: Grids and Words** | Matrices: row and column totals, add, transpose, pass to a function. Strings: the end flag, fgets, length, reverse, palindrome, string functions | [Open slides (PDF)](https://github.com/sachugowda/CSE-1003-FoCP/blob/main/Module-4/class3/FoCP%20Module%204%20%C2%B7%20Class%203%20%E2%80%94%20Grids%20and%20Words.pdf) | [Code](https://github.com/sachugowda/CSE-1003-FoCP/tree/main/Module-4/class3/code) |
+
+🧪 **[Play with Concepts](https://sachugowda.github.io/CSE-1003-FoCP/practice/module4-playground.html)**: predict it, run it, break it, fix it, for arrays, matrices and strings  ·  🤖 **[Module 4 assistant](https://notebook.google.com/notebook/31641453-8368-4b9e-b5aa-3b02dd2b8961)**: ask any doubt in English or Hindi, or paste a Play with Concepts question for a hint
+
+### ▶️ Run the class programs in your browser
+
+Open a link, type any input in the input box, then press **Run**.
+
+**Class 1: Many Boxes, One Name:** [array_lab.c](https://onlinegdb.com/43tQnNo5V) (marks of five students in an array) · [array2d_lab.c](https://onlinegdb.com/EuW-mZYkp) (cinema seat map)
+
+**Class 2: Shift, Search and Share:** [insert_lab.c](https://onlinegdb.com/AcOu3OBNbM) (insert into an array) · [delete_lab.c](https://onlinegdb.com/AcOu3OBNbM) (delete from an array, same starter) · [merge_lab.c](https://onlinegdb.com/CKwAXm5gr) (merge two arrays) · [search_lab.c](https://onlinegdb.com/YKq7_6w7y) (search the array)
+
+**Class 3: Grids and Words:** [matrix_lab.c](https://onlinegdb.com/CvadKyJoj) (print a grid row by row, then change it)
+
+**Tip:** to watch an array or a loop step by step, paste a program into [Python Tutor for C](https://pythontutor.com/c.html).
+
+### ✍️ Exam-style questions
+
+1. Write a program that reads 5 marks into an array and prints the largest mark and its position (index).
+2. An array holds `10 20 30 40 50`. Show the array after inserting 25 at position 2, and then after deleting the element at position 4. Write the shifting loop for each.
+3. Write a function `int linearSearch(int a[], int n, int key)` that returns the index or -1. Then explain why binary search needs a sorted array and trace it for `{5, 12, 18, 25, 31, 40}` and key 25.
+4. Read a 3 x 3 matrix. Print the sum of each row, the sum of each column and the sum of the main diagonal. Then print its transpose.
+5. Read a line with `fgets`. Without using `strlen`, print its length, the number of vowels, and the line reversed. Say whether it is a palindrome. Explain why the `\n` that `fgets` keeps must be removed before you compare strings.
+
+**Check your work:** run your program with two or three different inputs, including an empty or one-element case. For arrays, draw the boxes and the index numbers on paper first.
+
+### 📚 Go deeper
+
+| Class | Read (W3Schools) | Watch |
+|---|---|---|
+| Class 1 | [C Arrays](https://www.w3schools.com/c/c_arrays.php) · [Get Array Size](https://www.w3schools.com/c/c_arrays_size.php) · [Multidimensional Arrays](https://www.w3schools.com/c/c_arrays_multi.php) | [NPTEL: Problem Solving through Programming in C](https://nptel.ac.in/courses/106105171) |
+| Class 2 | [C Arrays](https://www.w3schools.com/c/c_arrays.php) · [Function Parameters](https://www.w3schools.com/c/c_functions_parameters.php) | [NPTEL: Problem Solving through Programming in C](https://nptel.ac.in/courses/106105171) |
+| Class 3 | [Multidimensional Arrays](https://www.w3schools.com/c/c_arrays_multi.php) · [C Strings](https://www.w3schools.com/c/c_strings.php) · [String Functions](https://www.w3schools.com/c/c_strings_functions.php) · [String Input](https://www.w3schools.com/c/c_user_input_strings.php) | [NPTEL: Problem Solving through Programming in C](https://nptel.ac.in/courses/106105171) |
+
+</details>
 
 <a id="module-3"></a>
 <details open>
