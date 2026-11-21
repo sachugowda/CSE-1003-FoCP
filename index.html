@@ -73,10 +73,10 @@
   .table-wrap { overflow-x: auto; }
 
 
-  .mtabs { display: flex; gap: 10px; margin-top: 22px; padding: 12px 0 14px; overflow-x: auto; position: sticky; top: 0; z-index: 5;
-           background: var(--bench); border-bottom: 1px solid var(--line); scrollbar-width: none; }
+  .mtabs { display: flex; gap: 10px; margin-top: 22px; padding: 12px 0 14px; flex-wrap: wrap;
+           background: var(--bench); border-bottom: 1px solid var(--line); }
   .mtabs::-webkit-scrollbar { display: none; }
-  .mtab { flex: 0 0 auto; display: flex; align-items: center; gap: 12px; padding: 8px 18px 8px 8px; border: 2px solid var(--line);
+  .mtab { flex: 0 1 auto; display: flex; align-items: center; gap: 12px; padding: 8px 18px 8px 8px; border: 2px solid var(--line);
           border-radius: 999px; background: var(--panel); color: var(--ink); cursor: pointer; text-align: left; font: 600 16px var(--sans);
           transition: border-color .15s ease, background .15s ease; }
   .mtab:hover { border-color: var(--wire); }
@@ -93,7 +93,7 @@
   .panel[hidden] { display: none; }
   footer { margin-top: 44px; font-size: 14px; color: var(--muted); }
   a:focus-visible, summary:focus-visible { outline: 3px solid var(--wire); outline-offset: 2px; border-radius: 4px; }
-  @media (max-width: 560px) { h1 { font-size: 29px; } .module { padding: 20px 16px; } .res { grid-template-columns: 1fr; padding-left: 4px; } }
+  @media (max-width: 560px) { .mtabs { display: grid; grid-template-columns: 1fr 1fr; } .mtab { padding: 6px 12px 6px 6px; gap: 8px; font-size: 14px; } .mtab .badge { width: 32px; height: 32px; flex: none; } .mtab .txt small { font-size: 12px; } h1 { font-size: 29px; } .module { padding: 20px 16px; } .res { grid-template-columns: 1fr; padding-left: 4px; } }
   @media (prefers-reduced-motion: reduce) { .tile { transition: none; } .tile:hover { transform: none; } }
 </style>
 </head>
@@ -110,8 +110,9 @@
   <nav class="mtabs" role="tablist" aria-label="Course modules">
     <button class="mtab" role="tab" aria-selected="false" aria-controls="module-1" id="tab-module-1"><span class="badge">M1</span><span class="txt">Fundamentals<small>Module 1</small></span></button>
     <button class="mtab" role="tab" aria-selected="false" aria-controls="module-2" id="tab-module-2"><span class="badge">M2</span><span class="txt">Control statements<small>Module 2</small></span></button>
-    <button class="mtab" role="tab" aria-selected="true" aria-controls="module-3" id="tab-module-3"><span class="badge">M3</span><span class="txt">Functions and recursion<small>Module 3</small></span></button>
-    <button class="mtab later" role="tab" aria-selected="false" aria-controls="more" id="tab-more"><span class="badge">4–6</span><span class="txt">Coming next<small>Modules 4 to 6</small></span></button>
+    <button class="mtab" role="tab" aria-selected="false" aria-controls="module-3" id="tab-module-3"><span class="badge">M3</span><span class="txt">Functions and recursion<small>Module 3</small></span></button>
+    <button class="mtab" role="tab" aria-selected="true" aria-controls="module-4" id="tab-module-4"><span class="badge">M4</span><span class="txt">Arrays and strings<small>Module 4</small></span></button>
+    <button class="mtab later" role="tab" aria-selected="false" aria-controls="more" id="tab-more"><span class="badge">5–6</span><span class="txt">Coming next<small>Modules 5 and 6</small></span></button>
   </nav>
 
   <!-- MODULE 1 -->
@@ -187,10 +188,22 @@
     <p style="font-size:15.5px;color:var(--muted)"><b style="color:var(--ink)">Check your work:</b> run your program with two or three different inputs, including a boundary value. For recursion, draw the stack on paper first.</p>
   </section>
 
+  <!-- MODULE 4 -->
+  <section class="module panel" id="module-4" role="tabpanel" aria-labelledby="tab-module-4">
+    <div class="module-head"><span class="num">M4</span><h2>Arrays and Strings</h2></div>
+    <h3>Start here</h3>
+    <div class="start"><a class="tile" href="https://github.com/sachugowda/CSE-1003-FoCP/blob/main/Module-4/class1/FoCP%20Module%204%20%C2%B7%20Class%201%20%E2%80%94%20Many%20Boxes%2C%20One%20Name.pdf" target="_blank" rel="noopener"><span class="kind">Slides</span><strong>Class 1: Many Boxes, One Name</strong><span class="desc">Arrays: declare, fill, read and traverse one-dimensional arrays; a first look at two-dimensional arrays</span><span class="go">Open slides ↗</span></a><a class="tile" href="https://github.com/sachugowda/CSE-1003-FoCP/blob/main/Module-4/class2/FoCP%20Module%204%20%C2%B7%20Class%202%20%E2%80%94%20Shift%2C%20Search%20and%20Share.pdf" target="_blank" rel="noopener"><span class="kind">Slides</span><strong>Class 2: Shift, Search and Share</strong><span class="desc">Insert and delete in an array, linear and binary search, merging sorted arrays, passing arrays to functions</span><span class="go">Open slides ↗</span></a><a class="tile" href="https://github.com/sachugowda/CSE-1003-FoCP/blob/main/Module-4/class3/FoCP%20Module%204%20%C2%B7%20Class%203%20%E2%80%94%20Grids%20and%20Words.pdf" target="_blank" rel="noopener"><span class="kind">Slides</span><strong>Class 3: Grids and Words</strong><span class="desc">Matrices: row and column totals, add, transpose, pass to a function. Strings: the end flag, fgets, length, reverse, palindrome, string functions</span><span class="go">Open slides ↗</span></a><a class="tile key" href="https://sachugowda.github.io/CSE-1003-FoCP/practice/module4-playground.html" target="_blank" rel="noopener"><span class="kind">Play</span><strong>Play with Concepts</strong><span class="desc">Predict it, run it, break it, fix it</span><span class="go">Start playing ↗</span></a><a class="tile key" href="https://notebook.google.com/notebook/31641453-8368-4b9e-b5aa-3b02dd2b8961" target="_blank" rel="noopener"><span class="kind">Assistant</span><strong>Module 4 assistant</strong><span class="desc">Type hi to start. Ask doubts, revise, or get a hint</span><span class="go">Ask a question ↗</span></a></div>
+    <div class="how"><b>How to study:</b> go through each class&#39;s slides, then run its programs. Draw the boxes and index numbers on paper before you write the loop. Stuck? Trace the program line by line, like in the slides. Type the input in OnlineGDB&#39;s input box before pressing Run.</div>
+    <h3>Run, read and watch: class by class</h3>
+    <div><details class="topic"><summary><span class="n">1</span>Class 1: Many Boxes, One Name</summary><dl class="res"><dt>Run</dt><dd><a href="https://onlinegdb.com/43tQnNo5V" target="_blank" rel="noopener">array_lab.c</a> <span style="color:var(--muted)">(marks of five students in an array)</span> · <a href="https://onlinegdb.com/EuW-mZYkp" target="_blank" rel="noopener">array2d_lab.c</a> <span style="color:var(--muted)">(cinema seat map)</span></dd><dt>Code</dt><dd><a href="https://github.com/sachugowda/CSE-1003-FoCP/tree/main/Module-4/class1/code" target="_blank" rel="noopener">All code for this class</a></dd><dt>Read</dt><dd><a target="_blank" rel="noopener" href="https://www.w3schools.com/c/c_arrays.php">C Arrays</a> · <a target="_blank" rel="noopener" href="https://www.w3schools.com/c/c_arrays_size.php">Get Array Size</a> · <a target="_blank" rel="noopener" href="https://www.w3schools.com/c/c_arrays_multi.php">Multidimensional Arrays</a></dd><dt>Watch</dt><dd><a href="https://nptel.ac.in/courses/106105171" target="_blank" rel="noopener">NPTEL: Problem Solving through Programming in C</a></dd><dt>Try</dt><dd><a href="https://pythontutor.com/c.html" target="_blank" rel="noopener">Python Tutor for C</a> <span style="color:var(--muted)">(watch an array or a loop run step by step)</span></dd></dl></details><details class="topic"><summary><span class="n">2</span>Class 2: Shift, Search and Share</summary><dl class="res"><dt>Run</dt><dd><a href="https://onlinegdb.com/AcOu3OBNbM" target="_blank" rel="noopener">insert_lab.c</a> <span style="color:var(--muted)">(insert into an array)</span> · <a href="https://onlinegdb.com/AcOu3OBNbM" target="_blank" rel="noopener">delete_lab.c</a> <span style="color:var(--muted)">(delete, same starter)</span> · <a href="https://onlinegdb.com/CKwAXm5gr" target="_blank" rel="noopener">merge_lab.c</a> <span style="color:var(--muted)">(merge two arrays)</span> · <a href="https://onlinegdb.com/YKq7_6w7y" target="_blank" rel="noopener">search_lab.c</a> <span style="color:var(--muted)">(search the array)</span></dd><dt>Code</dt><dd><a href="https://github.com/sachugowda/CSE-1003-FoCP/tree/main/Module-4/class2/code" target="_blank" rel="noopener">All code for this class</a></dd><dt>Read</dt><dd><a target="_blank" rel="noopener" href="https://www.w3schools.com/c/c_arrays.php">C Arrays</a> · <a target="_blank" rel="noopener" href="https://www.w3schools.com/c/c_functions_parameters.php">Function Parameters</a></dd><dt>Watch</dt><dd><a href="https://nptel.ac.in/courses/106105171" target="_blank" rel="noopener">NPTEL: Problem Solving through Programming in C</a></dd><dt>Try</dt><dd><a href="https://pythontutor.com/c.html" target="_blank" rel="noopener">Python Tutor for C</a> <span style="color:var(--muted)">(watch an array or a loop run step by step)</span></dd></dl></details><details class="topic"><summary><span class="n">3</span>Class 3: Grids and Words</summary><dl class="res"><dt>Run</dt><dd><a href="https://onlinegdb.com/CvadKyJoj" target="_blank" rel="noopener">matrix_lab.c</a> <span style="color:var(--muted)">(print a grid row by row, then change it)</span></dd><dt>Code</dt><dd><a href="https://github.com/sachugowda/CSE-1003-FoCP/tree/main/Module-4/class3/code" target="_blank" rel="noopener">All code for this class</a></dd><dt>Read</dt><dd><a target="_blank" rel="noopener" href="https://www.w3schools.com/c/c_arrays_multi.php">Multidimensional Arrays</a> · <a target="_blank" rel="noopener" href="https://www.w3schools.com/c/c_strings.php">C Strings</a> · <a target="_blank" rel="noopener" href="https://www.w3schools.com/c/c_strings_functions.php">String Functions</a> · <a target="_blank" rel="noopener" href="https://www.w3schools.com/c/c_user_input_strings.php">String Input</a></dd><dt>Watch</dt><dd><a href="https://nptel.ac.in/courses/106105171" target="_blank" rel="noopener">NPTEL: Problem Solving through Programming in C</a></dd><dt>Try</dt><dd><a href="https://pythontutor.com/c.html" target="_blank" rel="noopener">Python Tutor for C</a> <span style="color:var(--muted)">(watch an array or a loop run step by step)</span></dd></dl></details></div>
+    <h3>Exam-style questions</h3>
+    <ol class="exam"><li>Write a program that reads 5 marks into an array and prints the largest mark and its position (index).</li><li>An array holds <code>10 20 30 40 50</code>. Show the array after inserting 25 at position 2, and then after deleting the element at position 4. Write the shifting loop for each.</li><li>Write a function <code>int linearSearch(int a[], int n, int key)</code> that returns the index or -1. Then explain why binary search needs a sorted array and trace it for <code>{5, 12, 18, 25, 31, 40}</code> and key 25.</li><li>Read a 3 x 3 matrix. Print the sum of each row, the sum of each column and the sum of the main diagonal. Then print its transpose.</li><li>Read a line with <code>fgets</code>. Without using <code>strlen</code>, print its length, the number of vowels, and the line reversed. Say whether it is a palindrome. Explain why the <code>\n</code> that <code>fgets</code> keeps must be removed before you compare strings.</li></ol>
+    <p style="font-size:15.5px;color:var(--muted)"><b style="color:var(--ink)">Check your work:</b> run your program with two or three different inputs, including an empty or one-element case. For arrays, draw the boxes and the index numbers on paper first.</p>
+  </section>
+
   <div class="panel" id="more" role="tabpanel" aria-labelledby="tab-more">
   <h2>Coming next</h2>
   <ul class="later">
-    <li><b>Module 4</b><br>Arrays and Strings</li>
     <li><b>Module 5</b><br>Pointers, Dynamic Memory and Structures</li>
     <li><b>Module 6</b><br>Files in C</li>
   </ul>
@@ -289,7 +302,7 @@
     }
     tabs.forEach(function (t) { t.addEventListener("click", function () { show(t.getAttribute("aria-controls"), true); }); });
     var start = (location.hash || "").slice(1);
-    show(document.getElementById(start) && start !== "" ? start : "module-3", false);
+    show(document.getElementById(start) && start !== "" ? start : "module-4", false);
   })();
 </script>
 </body>
