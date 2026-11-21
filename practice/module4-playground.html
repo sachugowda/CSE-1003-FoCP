@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Play with Concepts: Module 4 · FoCP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bench: #EEF1F4;
+    --panel: #FFFFFF;
+    --line: #D3DAE3;
+    --ink: #14202E;
+    --muted: #5A6778;
+    --signal: #F2A900;
+    --signal-soft: #FFF3D1;
+    --wire: #1F5FBF;
+    --wire-soft: #E4ECF8;
+    --good: #1E7A50;
+    --good-soft: #E1F2E9;
+    --bad: #B8332A;
+    --bad-soft: #FAE5E3;
+    --sans: "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+    --mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bench);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 32px 20px 56px; }
+
+  header h1 { font-size: 30px; line-height: 1.2; margin: 0 0 6px; font-weight: 700; }
+  header p { margin: 0; color: var(--muted); }
+
+  .tabs { display: flex; gap: 6px; margin: 28px 0 0; border-bottom: 2px solid var(--line); flex-wrap: wrap; }
+  .tab {
+    font: 600 16px var(--sans); color: var(--muted);
+    background: none; border: none; padding: 10px 14px 12px; cursor: pointer;
+    border-bottom: 3px solid transparent; margin-bottom: -2px;
+  }
+  .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--wire); }
+  .tab:hover { color: var(--ink); }
+
+  .panel { background: var(--panel); border: 1px solid var(--line); border-top: none; border-radius: 0 0 10px 10px; padding: 26px 24px 28px; }
+  .panel[hidden] { display: none; }
+
+  .bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 22px; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .seg button { font: 500 15px var(--sans); border: none; background: var(--panel); color: var(--muted); padding: 7px 12px; cursor: pointer; }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .seg button[aria-pressed="true"] { background: var(--wire-soft); color: var(--wire); font-weight: 600; }
+  .score { font-size: 15px; color: var(--muted); }
+  .score b { color: var(--ink); }
+
+  .prompt { font-size: 19px; margin: 0 0 4px; }
+  .target { font: 600 64px/1.1 var(--mono); margin: 6px 0 22px; letter-spacing: 1px; }
+  .target small { font: 500 18px var(--sans); color: var(--muted); margin-left: 8px; letter-spacing: 0; }
+
+  /* switches: the one bold element */
+  .board { display: flex; gap: 8px; justify-content: flex-start; margin: 4px 0 8px; flex-wrap: nowrap; }
+  .sw { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 0 1 64px; min-width: 34px; }
+  .sw .bit { font: 600 18px var(--mono); color: var(--muted); }
+  .sw.on .bit { color: var(--ink); }
+  .toggle {
+    width: 100%; max-width: 54px; height: 92px; border-radius: 10px;
+    background: #2A3442; border: 2px solid #1A222D; position: relative; cursor: pointer; padding: 0;
+  }
+  .toggle::after {
+    content: ""; position: absolute; left: 6px; right: 6px; height: 38px; bottom: 6px;
+    border-radius: 7px; background: #5E6B7C; transition: bottom .15s ease, background .15s ease, box-shadow .15s ease;
+  }
+  .sw.on .toggle::after { bottom: 44px; background: var(--signal); box-shadow: 0 0 18px 4px rgba(242,169,0,.55); }
+  .toggle:disabled { cursor: default; }
+  .sw .w { font: 500 14px var(--mono); color: var(--muted); }
+  .live { font: 500 16px var(--mono); color: var(--muted); margin: 8px 0 18px; min-height: 24px; }
+
+  input[type="text"], input[type="number"] {
+    font: 600 26px var(--mono); width: 200px; padding: 8px 12px;
+    border: 2px solid var(--line); border-radius: 8px; color: var(--ink); background: var(--panel);
+  }
+  input:focus { outline: none; border-color: var(--wire); }
+
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 18px; }
+  .btn { font: 600 16px var(--sans); border-radius: 8px; padding: 10px 18px; cursor: pointer; border: 2px solid var(--wire); }
+  .btn.primary { background: var(--wire); color: #fff; }
+  .btn.ghost { background: var(--panel); color: var(--wire); }
+  .btn:disabled { opacity: .45; cursor: default; }
+
+  .feedback { margin-top: 18px; padding: 14px 16px; border-radius: 8px; display: none; }
+  .feedback.show { display: block; }
+  .feedback.ok { background: var(--good-soft); color: var(--good); }
+  .feedback.no { background: var(--bad-soft); color: var(--bad); }
+  .feedback p { margin: 4px 0 0; color: var(--ink); }
+  .feedback strong { font-size: 17px; }
+
+  pre {
+    background: #14202E; color: #E6EBF2; font: 15.5px/1.6 var(--mono);
+    padding: 16px 18px; border-radius: 8px; overflow-x: auto; margin: 10px 0 18px;
+  }
+  .task { color: var(--muted); margin: 0 0 4px; }
+  .choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+  .choice { font: 600 16px var(--sans); text-align: left; padding: 12px 14px; border-radius: 8px; border: 2px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+  .choice:hover:not(:disabled) { border-color: var(--wire); }
+  .choice.right { border-color: var(--good); background: var(--good-soft); color: var(--good); }
+  .choice.wrong { border-color: var(--bad); background: var(--bad-soft); color: var(--bad); }
+  .choice:disabled { cursor: default; }
+
+  table.trace { border-collapse: collapse; margin-top: 12px; font-family: var(--mono); font-size: 15px; }
+  table.trace th, table.trace td { border: 1px solid var(--line); padding: 5px 14px; text-align: right; }
+  table.trace th { background: var(--bench); font-weight: 600; }
+
+
+  .steps { display: flex; flex-direction: column; gap: 8px; }
+  .step { font: 500 16px var(--sans); text-align: left; padding: 10px 14px; border-radius: 8px; border: 2px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+  .step:hover:not(:disabled) { border-color: var(--wire); }
+  .step:disabled { opacity: .35; cursor: default; }
+  .fixed { padding: 8px 14px; border-radius: 8px; background: var(--bench); color: var(--muted); font-weight: 600; }
+  ol.mine { margin: 6px 0 0; padding-left: 26px; min-height: 30px; }
+  ol.mine li { padding: 5px 0; }
+  ol.mine li.right { color: var(--good); } ol.mine li.wrong { color: var(--bad); }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 620px) { .cols { grid-template-columns: 1fr; } }
+  .h3 { font-weight: 600; margin: 0 0 6px; }
+  .shape-choice { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+  .shape-choice svg { width: 96px; height: 52px; }
+  .statement { font: 600 26px var(--mono); margin: 8px 0 20px; padding: 14px 18px; background: var(--bench); border-radius: 8px; }
+
+  .help { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: var(--wire-soft); border: 1px solid var(--line); border-top: none; padding: 10px 16px; font-size: 15px; }
+  .help span:first-child { flex: 1 1 260px; }
+  .btn.small { padding: 6px 12px; font-size: 14px; text-decoration: none; display: inline-block; }
+  .copied { color: var(--good); font-weight: 600; }
+  .tip { margin-top: 26px; font-size: 15px; color: var(--muted); }
+  footer { margin-top: 28px; font-size: 14px; color: var(--muted); }
+
+  button:focus-visible, .tab:focus-visible, .toggle:focus-visible { outline: 3px solid var(--wire); outline-offset: 2px; }
+  @media (max-width: 520px) {
+    .target { font-size: 48px; }
+    .toggle { height: 78px; }
+    .toggle::after { height: 31px; }
+    .sw.on .toggle::after { bottom: 37px; }
+    .panel { padding: 22px 16px 24px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .toggle::after { transition: none; } }
+
+  .opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; margin-top: 6px; }
+  .opts .choice.mono { font-family: var(--mono); white-space: pre; }
+  .qtext { font-size: 19px; margin: 0 0 6px; }
+  .sub { color: var(--muted); font-size: 15px; margin: 0 0 4px; }
+  .tagline { font-style: italic; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Play with Concepts: Module 4</h1>
+    <p><span class="tagline">Predict it, run it, break it, fix it.</span> Arrays, matrices and strings, CSE-1003, IIIT Bhopal. Every question is new, so play as long as you like. Copy any code into OnlineGDB to see it run.</p>
+  </header>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" aria-controls="p-c1">Class 1: Arrays</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-c2">Class 2: Arrays at work</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-c3">Class 3: Matrices</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-str">Class 3: Strings</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-trap">Beyond the class: traps</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-fix">Missing lines and bugs</button>
+  </div>
+  <div class="help" id="help">
+    <span>Stuck? Copy the question and ask the course assistant for a hint. You can ask in your own language, such as Hindi, and listen to it as audio.</span>
+    <button class="btn ghost small" id="copy-q">Copy question</button>
+    <a class="btn primary small" id="ask-link" target="_blank" rel="noopener">Open assistant</a>
+    <span class="copied" id="copied" aria-live="polite"></span>
+  </div>
+
+  <section class="panel" id="p-c1" role="tabpanel">
+    <div class="bar"><div class="seg" aria-label="Practice type" style="flex-wrap:wrap"><button data-tab="c1" data-mode="pr" aria-pressed="true">What does it print?</button><button data-tab="c1" data-mode="idx" aria-pressed="false">Which index?</button><button data-tab="c1" data-mode="decl" aria-pressed="false">Will it compile?</button><button data-tab="c1" data-mode="bnd" aria-pressed="false">Inside or outside?</button><button data-tab="c1" data-mode="cnt" aria-pressed="false">Count the passes</button></div><div class="score" id="s-c1"></div></div>
+    <div id="q-c1"></div>
+    <div class="feedback" id="fb-c1" aria-live="polite"></div>
+    <div class="actions"><button class="btn ghost" data-next="c1">Next question</button></div>
+  </section>
+  <section class="panel" id="p-c2" role="tabpanel" hidden>
+    <div class="bar"><div class="seg" aria-label="Practice type" style="flex-wrap:wrap"><button data-tab="c2" data-mode="ins" aria-pressed="true">Insert</button><button data-tab="c2" data-mode="del" aria-pressed="false">Delete</button><button data-tab="c2" data-mode="srch" aria-pressed="false">Linear search</button><button data-tab="c2" data-mode="bin" aria-pressed="false">Binary search</button><button data-tab="c2" data-mode="mrg" aria-pressed="false">Merge</button><button data-tab="c2" data-mode="fn" aria-pressed="false">Arrays and functions</button></div><div class="score" id="s-c2"></div></div>
+    <div id="q-c2"></div>
+    <div class="feedback" id="fb-c2" aria-live="polite"></div>
+    <div class="actions"><button class="btn ghost" data-next="c2">Next question</button></div>
+  </section>
+  <section class="panel" id="p-c3" role="tabpanel" hidden>
+    <div class="bar"><div class="seg" aria-label="Practice type" style="flex-wrap:wrap"><button data-tab="c3" data-mode="pick" aria-pressed="true">Pick a box</button><button data-tab="c3" data-mode="tot" aria-pressed="false">Add them up</button><button data-tab="c3" data-mode="loop" aria-pressed="false">Nested loops</button><button data-tab="c3" data-mode="tr" aria-pressed="false">Transpose</button><button data-tab="c3" data-mode="mem" aria-pressed="false">Rows in memory</button><button data-tab="c3" data-mode="fnm" aria-pressed="false">Matrix in a function</button></div><div class="score" id="s-c3"></div></div>
+    <div id="q-c3"></div>
+    <div class="feedback" id="fb-c3" aria-live="polite"></div>
+    <div class="actions"><button class="btn ghost" data-next="c3">Next question</button></div>
+  </section>
+  <section class="panel" id="p-str" role="tabpanel" hidden>
+    <div class="bar"><div class="seg" aria-label="Practice type" style="flex-wrap:wrap"><button data-tab="str" data-mode="box" aria-pressed="true">Boxes and \0</button><button data-tab="str" data-mode="fetch" aria-pressed="false">Fetch with s[i]</button><button data-tab="str" data-mode="chr" aria-pressed="false">Letters are numbers</button><button data-tab="str" data-mode="loop" aria-pressed="false">Walk the string</button><button data-tab="str" data-mode="lib" aria-pressed="false">strcmp, strcpy, strcat</button><button data-tab="str" data-mode="io" aria-pressed="false">scanf and fgets</button></div><div class="score" id="s-str"></div></div>
+    <div id="q-str"></div>
+    <div class="feedback" id="fb-str" aria-live="polite"></div>
+    <div class="actions"><button class="btn ghost" data-next="str">Next question</button></div>
+  </section>
+  <section class="panel" id="p-trap" role="tabpanel" hidden>
+    <div class="bar"><div class="score" id="s-trap"></div></div>
+    <div id="q-trap"></div>
+    <div class="feedback" id="fb-trap" aria-live="polite"></div>
+    <div class="actions"><button class="btn ghost" data-next="trap">Next question</button></div>
+  </section>
+  <section class="panel" id="p-fix" role="tabpanel" hidden>
+    <div class="bar"><div class="seg" aria-label="Practice type" style="flex-wrap:wrap"><button data-tab="fix" data-mode="miss" aria-pressed="true">Pick the missing line</button><button data-tab="fix" data-mode="bug" aria-pressed="false">Find the bug</button></div><div class="score" id="s-fix"></div></div>
+    <div id="q-fix"></div>
+    <div class="feedback" id="fb-fix" aria-live="polite"></div>
+    <div class="actions"><button class="btn ghost" data-next="fix">Next question</button></div>
+  </section>
+
+  <footer>CSE-1003 Fundamentals of Computer Programming, IIIT Bhopal</footer>
+</div>
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var R = function (a, b) { return a + Math.floor(Math.random() * (b - a + 1)); };
+  var pick = function (a) { return a[R(0, a.length - 1)]; };
+  var esc = function (s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); };
+  var shuffle = function (a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = R(0, i), t = a[i]; a[i] = a[j]; a[j] = t; } return a; };
+  var idiv = function (a, b) { return Math.trunc(a / b); };
+  var fmt = function (x) { return Math.abs(x - Math.round(x)) < 1e-9 ? String(Math.round(x)) : x.toFixed(2); };
+
+  /* ---------- scores ---------- */
+  var KEY = "focp-m4-best", scores = {};
+  ["c1", "c2", "c3", "str", "trap", "fix"].forEach(function (k) { scores[k] = { r: 0, t: 0, s: 0, best: 0 }; });
+  try { var sv = JSON.parse(localStorage.getItem(KEY) || "{}"); Object.keys(sv).forEach(function (k) { if (scores[k]) scores[k].best = sv[k]; }); } catch (e) {}
+  function showScore(k) { var s = scores[k]; $("s-" + k).innerHTML = "Correct <b>" + s.r + "/" + s.t + "</b>, streak <b>" + s.s + "</b>, best <b>" + s.best + "</b>"; }
+  function record(k, ok) { var s = scores[k]; s.t++; if (ok) { s.r++; s.s++; } else s.s = 0;
+    if (s.s > s.best) { s.best = s.s; try { var b = {}; Object.keys(scores).forEach(function (x) { b[x] = scores[x].best; }); localStorage.setItem(KEY, JSON.stringify(b)); } catch (e) {} }
+    showScore(k); }
+  Object.keys(scores).forEach(showScore);
+
+  /* ---------- question renderer ----------
+     q = {text, code?, options? [strings], answer (string or number), numeric?: bool, tol?, mono?: bool, why} */
+  var cur = {};
+  function render(k, q) {
+    cur[k] = { q: q, done: false };
+    var h = '<p class="qtext">' + q.text + '</p>';
+    if (q.code) h += '<pre><code>' + esc(q.code) + '</code></pre>';
+    if (q.options) {
+      h += '<div class="opts">' + q.options.map(function (o, i) { return '<button class="choice' + (q.mono ? ' mono' : '') + '" data-i="' + i + '">' + esc(o) + '</button>'; }).join("") + '</div>';
+    } else {
+      h += '<label class="task" for="in-' + k + '">Your answer</label><br><input type="' + (q.numeric ? "number" : "text") + '" step="any" id="in-' + k + '" autocomplete="off">' +
+           '<div class="actions"><button class="btn primary" id="chk-' + k + '">Check</button></div>';
+    }
+    $("q-" + k).innerHTML = h; $("fb-" + k).className = "feedback"; $("fb-" + k).innerHTML = "";
+    if (q.options) {
+      $("q-" + k).querySelectorAll(".choice").forEach(function (b) { b.addEventListener("click", function () {
+        if (cur[k].done) return; cur[k].done = true; var i = +b.dataset.i, ok = q.options[i] === q.answer;
+        $("q-" + k).querySelectorAll(".choice").forEach(function (x) { x.disabled = true; var oi = +x.dataset.i;
+          if (q.options[oi] === q.answer) x.classList.add("right"); else if (oi === i) x.classList.add("wrong"); });
+        finish(k, ok); }); });
+    } else {
+      var go = function () { if (cur[k].done) return; var v = $("in-" + k).value.trim(); if (v === "") { fb(k, false, "Type your answer first.", ""); return; }
+        var ok;
+        if (q.numeric) ok = Math.abs(parseFloat(v) - q.answer) <= (q.tol || 1e-9);
+        else ok = v.replace(/\s+/g, " ").toLowerCase() === String(q.answer).replace(/\s+/g, " ").toLowerCase();
+        cur[k].done = true; $("chk-" + k).disabled = true; finish(k, ok); };
+      $("chk-" + k).addEventListener("click", go);
+      $("in-" + k).addEventListener("keydown", function (e) { if (e.key === "Enter") go(); });
+    }
+  }
+  function fb(k, ok, title, body) { var f = $("fb-" + k); f.className = "feedback show " + (ok ? "ok" : "no"); f.innerHTML = "<strong>" + title + "</strong>" + (body ? "<p>" + body + "</p>" : ""); }
+  function finish(k, ok) { var q = cur[k].q; record(k, ok);
+    var shown = q.numeric ? fmt(q.answer) : q.answer;
+    fb(k, ok, ok ? "Correct: " + esc(shown) + "." : "The answer is " + esc(shown) + ".", q.why); }
+
+  /* ---------- helpers for Module 4 ---------- */
+  var INC = "#include <stdio.h>\n#include <string.h>\n#include <ctype.h>\n\n";
+  function mainProg(body, pre) { return INC + (pre ? pre + "\n\n" : "") + "int main(void) {\n" + body.split("\n").map(function (l) { return "    " + l; }).join("\n") + "\n    return 0;\n}\n"; }
+  function rndArr(n, lo, hi, distinct) { var a = []; while (a.length < n) { var v = R(lo, hi); if (!distinct || a.indexOf(v) < 0) a.push(v); } return a; }
+  function sorted(a) { return a.slice().sort(function (x, y) { return x - y; }); }
+  function lit(a) { return "{" + a.join(", ") + "}"; }
+  function sp(a) { return a.join(" "); }
+  function opts4(correct, others) { var all = [correct]; others.forEach(function (o) { if (all.indexOf(o) < 0) all.push(o); }); return shuffle(all.slice(0, 4)); }
+  function ord(k) { return k + 1; }
+
+  /* ---------- Class 1: arrays ---------- */
+  var C1 = {
+    pr: function () {
+      var n = R(4, 6), a = rndArr(n, 1, 9), t = R(0, 9), decl = "int a[" + n + "] = " + lit(a) + ";", body, ans, why, num = true, k, i, j;
+      if (t === 0) { k = R(0, n - 1); body = 'printf("%d", a[' + k + ']);'; ans = a[k]; why = "Boxes are numbered from 0, so a[" + k + "] is the " + ord(k) + (k === 0 ? "st" : k === 1 ? "nd" : k === 2 ? "rd" : "th") + " value: " + a[k] + "."; }
+      else if (t === 1) { i = R(0, n - 2); j = R(i + 1, n - 1); body = 'printf("%d", a[' + i + '] + a[' + j + ']);'; ans = a[i] + a[j]; why = "a[" + i + "] is " + a[i] + " and a[" + j + "] is " + a[j] + ". Add the values, not the indexes."; }
+      else if (t === 2) { var p = shuffle(Array.apply(null, Array(n)).map(function (_, x) { return x; })); a = p; k = R(0, n - 1); decl = "int a[" + n + "] = " + lit(a) + ";"; body = 'printf("%d", a[a[' + k + ']]);'; ans = a[a[k]]; why = "The inside a[" + k + "] is " + a[k] + ". That value is used as an index, so we read a[" + a[k] + "] = " + ans + "."; }
+      else if (t === 3) { var s = a.reduce(function (x, y) { return x + y; }, 0); body = "int total = 0;\nfor (int i = 0; i < " + n + "; i++)\n    total = total + a[i];\nprintf(\"%d\", total);"; ans = s; why = "The loop visits every box once and adds it: " + a.join(" + ") + " = " + s + "."; }
+      else if (t === 4) { body = "for (int i = 0; i < " + n + "; i += 2)\n    printf(\"%d \", a[i]);"; var o = []; for (i = 0; i < n; i += 2) o.push(a[i]); ans = sp(o); num = false; why = "i goes 0, 2, 4, ... so only the boxes at those indexes are printed."; }
+      else if (t === 5) { var m = R(4, 6), c = R(1, 2), ini = rndArr(c, 1, 9); decl = "int a[" + m + "] = " + lit(ini) + ";"; body = 'printf("%d %d", a[' + (c - 1) + '], a[' + (m - 1) + ']);'; ans = ini[c - 1] + " 0"; num = false; why = "A partly filled list sets the rest of the boxes to 0, so the last box is 0."; a = ini; n = m; }
+      else if (t === 6) { k = R(0, n - 1); body = "for (int i = 0; i < " + n + "; i++)\n    a[i] = a[i] * 2;\nprintf(\"%d\", a[" + k + "]);"; ans = a[k] * 2; why = "Every box is doubled first. a[" + k + "] was " + a[k] + ", now " + ans + "."; }
+      else if (t === 7) { decl = "int a[] = " + lit(a) + ";"; body = 'printf("%d", (int)(sizeof(a) / sizeof(a[0])));'; ans = n; why = "sizeof(a) is the bytes of the whole array; dividing by one element's bytes counts the elements."; }
+      else if (t === 8) { body = "a[2] = a[0] + a[1];\nprintf(\"%d\", a[2]);"; ans = a[0] + a[1]; why = "a[2] is overwritten with " + a[0] + " + " + a[1] + " = " + ans + "."; }
+      else { body = "int t = a[0];\na[0] = a[" + (n - 1) + "];\na[" + (n - 1) + "] = t;\nprintf(\"%d %d\", a[0], a[" + (n - 1) + "]);"; ans = a[n - 1] + " " + a[0]; num = false; why = "Swap: the first and last values trade places, so the first box now holds " + a[n - 1] + "."; }
+      var code = decl + "\n" + body;
+      return { text: "What does this program print?", code: code, numeric: num, answer: ans, why: esc(why), prog: mainProg(code), out: String(ans) };
+    },
+    idx: function () {
+      var t = R(0, 3), n = R(4, 7), a, v, k;
+      if (t === 0) { a = rndArr(n, 10, 99, true); k = R(0, n - 1); return { text: "In which <b>index</b> is the value <b>" + a[k] + "</b>?", code: "int a[" + n + "] = " + lit(a) + ";", numeric: true, answer: k, why: "Count the boxes from 0: " + a.map(function (x, i) { return "a[" + i + "] = " + x; }).join(", ") + "." }; }
+      if (t === 1) return { text: "<b>int a[" + n + "];</b> What is the <b>last valid index</b>?", numeric: true, answer: n - 1, why: "The boxes are numbered 0 to " + (n - 1) + ". Index " + n + " does not exist." };
+      if (t === 2) { a = rndArr(n, 1, 9); return { text: "How many elements does this array have?", code: "int a[] = " + lit(a) + ";", numeric: true, answer: n, why: "With empty brackets the compiler counts the values: " + n + "." }; }
+      var right = "a[" + (n - 1) + "]";
+      return { text: "<b>int a[" + n + "];</b> Which one is the <b>last</b> element?", options: opts4(right, ["a[" + n + "]", "a[" + (n + 1) + "]", "a[1]"]), mono: true, answer: right, why: "The last index is size − 1 = " + (n - 1) + "." };
+    },
+    decl: function () {
+      var B = [
+        ["int a[5] = {1, 2, 3};", "Valid", "Valid. The first three boxes get 1, 2, 3 and the other two become 0."],
+        ["int a[] = {4, 8, 15};", "Valid", "Valid. The compiler counts three values, so the size is 3."],
+        ["int a[3] = {0};", "Valid", "Valid. {0} sets every box to 0."],
+        ["float a[3] = {1, 2.5, 3};", "Valid", "Valid. An array can hold any one type, here float."],
+        ["int a[2][3];", "Valid", "Valid. This is a table of 2 rows and 3 columns."],
+        ["int a[];", "Error", "Error. The compiler must know the size: write a size or give a list of values."],
+        ["int a[-2];", "Error", "Error. A size cannot be negative."],
+        ["int a[3.5];", "Error", "Error. The size must be a whole number."],
+        ["int a[3];\na = {1, 2, 3};", "Error", "Error. A list in braces can be used only when the array is declared. Later you must set each box."],
+        ["int a[3] = {1, 2, 3};\nint b[3];\nb = a;", "Error", "Error. One array cannot be copied into another with =. Copy box by box with a loop."]];
+      var x = pick(B);
+      return { text: "Will this compile?", code: x[0], options: ["Valid", "Error"], answer: x[1], why: esc(x[2]), prog: mainProg(x[0]), out: x[1] };
+    },
+    bnd: function () {
+      var n = R(4, 8), t = R(0, 2);
+      if (t === 0) { var k = pick([-1, n, n + 1, 0, n - 1, R(1, n - 2)]), ok = k >= 0 && k < n; return { text: "<b>int a[" + n + "];</b> Is <b>a[" + k + "]</b> inside the array?", options: ["Inside: a valid box", "Outside: undefined behaviour"], answer: ok ? "Inside: a valid box" : "Outside: undefined behaviour", why: "Valid indexes are 0 to " + (n - 1) + ". " + (ok ? "So " + k + " is a real box." : k + " is outside. C does not stop you: the program may print garbage, change another variable or crash.") }; }
+      var le = t === 1, cond = le ? "i <= " + n : "i < " + n;
+      return { text: "<b>int a[" + n + "];</b> Does this loop stay inside the array?", code: "for (int i = 0; " + cond + "; i++)\n    a[i] = 0;", options: ["Inside: every box is valid", "Goes one box too far"], answer: le ? "Goes one box too far" : "Inside: every box is valid", why: le ? "With <= the last pass uses i = " + n + ", but the last valid index is " + (n - 1) + ". This off-by-one is the most common array bug." : "i goes 0 to " + (n - 1) + ", exactly the valid boxes." };
+    },
+    cnt: function () {
+      var t = R(0, 4), s, e, st, c, code;
+      if (t === 0) { var n = R(3, 8); code = "int count = 0;\nfor (int i = 0; i < " + n + "; i++)\n    count++;"; c = n; }
+      else if (t === 1) { var n2 = R(3, 8); code = "int count = 0;\nfor (int i = 1; i <= " + n2 + "; i++)\n    count++;"; c = n2; }
+      else if (t === 2) { var n3 = R(3, 8); code = "int count = 0;\nfor (int i = " + (n3 - 1) + "; i >= 0; i--)\n    count++;"; c = n3; }
+      else if (t === 3) { var n4 = R(5, 11); st = pick([2, 3]); code = "int count = 0;\nfor (int i = 0; i < " + n4 + "; i += " + st + ")\n    count++;"; c = Math.ceil(n4 / st); }
+      else { var n5 = R(3, 7); code = "int count = 0;\nfor (int i = 0; i <= " + n5 + "; i++)\n    count++;"; c = n5 + 1; }
+      code += "\nprintf(\"%d\", count);";
+      return { text: "What does this program print?", code: code, numeric: true, answer: c, why: "List the values of i: the loop body runs once for each of them. It runs " + c + " times.", prog: mainProg(code), out: String(c) };
+    }
+  };
+
+  /* ---------- Class 2: insert, delete, search, merge, functions ---------- */
+  function plain(a, n) { return sp(a.slice(0, n)); }
+  var C2 = {
+    ins: function () {
+      var n = R(4, 6), a = sorted(rndArr(n, 10, 90, true)), pos = R(0, n), v = R(11, 99), t = R(0, 1);
+      var arr = a.slice(); arr.splice(pos, 0, v);
+      var code = "int a[10] = " + lit(a) + ";\nint n = " + n + ", pos = " + pos + ", value = " + v + ";\nfor (int i = n; i > pos; i--)\n    a[i] = a[i - 1];\na[pos] = value;\nn++;";
+      if (t === 0) { code += "\nfor (int i = 0; i < n; i++)\n    printf(\"%d \", a[i]);"; return { text: "What does this program print?", code: code, answer: sp(arr), why: esc("Everything from index " + pos + " moves one box right, then " + v + " goes into a[" + pos + "]."), prog: mainProg(code), out: sp(arr) }; }
+      var shifts = n - pos, code2 = "int a[10] = " + lit(a) + ";\nint n = " + n + ", pos = " + pos + ", value = " + v + ", moves = 0;\nfor (int i = n; i > pos; i--) {\n    a[i] = a[i - 1];\n    moves++;\n}\na[pos] = value;\nprintf(\"%d\", moves);";
+      return { text: "What does this program print?", code: code2, numeric: true, answer: shifts, why: "Only the values from index " + pos + " to the end move: n − pos = " + n + " − " + pos + " = " + shifts + ".", prog: mainProg(code2), out: String(shifts) };
+    },
+    del: function () {
+      var n = R(4, 6), a = rndArr(n, 10, 90, true), pos = R(0, n - 1), t = R(0, 2);
+      var arr = a.slice(); arr.splice(pos, 1);
+      var head = "int a[10] = " + lit(a) + ";\nint n = " + n + ", pos = " + pos + ";\nfor (int i = pos; i < n - 1; i++)\n    a[i] = a[i + 1];\n";
+      if (t === 0) { var code = head + "n--;\nfor (int i = 0; i < n; i++)\n    printf(\"%d \", a[i]);"; return { text: "What does this program print?", code: code, answer: sp(arr), why: esc("Everything after index " + pos + " moves one box left, and n-- hides the old last box."), prog: mainProg(code), out: sp(arr) }; }
+      if (t === 1) { var code1 = head + "for (int i = 0; i < n; i++)\n    printf(\"%d \", a[i]);"; var shown = arr.concat([a[n - 1]]); return { text: "The line <b>n--;</b> was forgotten. What does this program print?", code: code1, answer: sp(shown), why: esc("The values shifted left, but n is still " + n + ", so the loop also prints the old last box again: " + a[n - 1] + " appears twice."), prog: mainProg(code1), out: sp(shown) }; }
+      var c2 = "int a[10] = " + lit(a) + ";\nint n = " + n + ", pos = " + pos + ", moves = 0;\nfor (int i = pos; i < n - 1; i++) {\n    a[i] = a[i + 1];\n    moves++;\n}\nprintf(\"%d\", moves);";
+      return { text: "What does this program print?", code: c2, numeric: true, answer: n - 1 - pos, why: "The loop runs from i = " + pos + " to i = " + (n - 2) + ": n − 1 − pos = " + (n - 1 - pos) + " moves.", prog: mainProg(c2), out: String(n - 1 - pos) };
+    },
+    srch: function () {
+      var n = R(5, 7), a = rndArr(n, 10, 25), t = R(0, 3), key;
+      if (R(0, 3) === 0) key = (function () { var v; do { v = R(10, 25); } while (a.indexOf(v) >= 0); return v; })(); else key = a[R(0, n - 1)];
+      var first = a.indexOf(key), decl = "int a[" + n + "] = " + lit(a) + ";\nint key = " + key + ";\n";
+      if (t === 0) { var code = decl + "int found = -1;\nfor (int i = 0; i < " + n + "; i++)\n    if (a[i] == key) { found = i; break; }\nprintf(\"%d\", found);"; return { text: "What does this program print? (-1 means not found.)", code: code, numeric: true, answer: first, why: first < 0 ? key + " is not in the list, so found stays -1." : "break stops at the FIRST match, index " + first + ".", prog: mainProg(code), out: String(first) }; }
+      if (t === 1) { var code1 = decl + "int found = -1;\nfor (int i = 0; i < " + n + "; i++)\n    if (a[i] == key) found = i;\nprintf(\"%d\", found);"; var last = a.lastIndexOf(key); return { text: "This version has <b>no break</b>. What does it print?", code: code1, numeric: true, answer: last, why: last < 0 ? "No match, so -1." : "Without break the loop keeps going, so found ends as the LAST match, index " + last + ".", prog: mainProg(code1), out: String(last) }; }
+      if (t === 2) { var code2 = decl + "int checks = 0;\nfor (int i = 0; i < " + n + "; i++) {\n    checks++;\n    if (a[i] == key) break;\n}\nprintf(\"%d\", checks);"; var ck = first < 0 ? n : first + 1; return { text: "How many comparisons does this loop make? It prints <b>checks</b>.", code: code2, numeric: true, answer: ck, why: first < 0 ? "No match, so every box is checked: " + n + "." : "The match is at index " + first + ", so " + ck + " boxes are checked before break.", prog: mainProg(code2), out: String(ck) }; }
+      var cnt = a.filter(function (x) { return x === key; }).length, code3 = decl + "int count = 0;\nfor (int i = 0; i < " + n + "; i++)\n    if (a[i] == key) count++;\nprintf(\"%d\", count);";
+      return { text: "What does this program print?", code: code3, numeric: true, answer: cnt, why: "count goes up once for every box equal to " + key + ": " + cnt + ".", prog: mainProg(code3), out: String(cnt) };
+    },
+    bin: function () {
+      var n = R(6, 9), a = sorted(rndArr(n, 10, 90, true)), key, absent = R(0, 3) === 0;
+      if (absent) { do { key = R(10, 90); } while (a.indexOf(key) >= 0); } else key = a[R(0, n - 1)];
+      var low = 0, high = n - 1, cnt = 0, found = -1, trail = [];
+      while (low <= high) { var mid = Math.floor((low + high) / 2); cnt++; trail.push("a[" + mid + "] = " + a[mid]); if (a[mid] === key) { found = mid; break; } else if (a[mid] < key) low = mid + 1; else high = mid - 1; }
+      var code = "int a[" + n + "] = " + lit(a) + ";\nint key = " + key + ", low = 0, high = " + (n - 1) + ", count = 0;\nwhile (low <= high) {\n    int mid = (low + high) / 2;\n    count++;\n    if (a[mid] == key) break;\n    else if (a[mid] < key) low = mid + 1;\n    else high = mid - 1;\n}\nprintf(\"%d\", count);";
+      return { text: "Binary search on a sorted array. What does this program print?", code: code, numeric: true, answer: cnt, why: "The middle boxes checked, in order: " + trail.join(", ") + ". That is " + cnt + " comparisons" + (absent ? " (the key is not in the list)." : "."), prog: mainProg(code), out: String(cnt) };
+    },
+    mrg: function () {
+      var n1 = R(3, 4), n2 = R(3, 4), a = sorted(rndArr(n1, 1, 30, true)), b = sorted(rndArr(n2, 1, 30, true)), i = 0, j = 0, c = [];
+      while (i < n1 && j < n2) { if (a[i] <= b[j]) c.push(a[i++]); else c.push(b[j++]); }
+      while (i < n1) c.push(a[i++]); while (j < n2) c.push(b[j++]);
+      var code = "int a[" + n1 + "] = " + lit(a) + ";\nint b[" + n2 + "] = " + lit(b) + ";\nint c[" + (n1 + n2) + "], i = 0, j = 0, k = 0;\nwhile (i < " + n1 + " && j < " + n2 + ") {\n    if (a[i] <= b[j]) c[k++] = a[i++];\n    else c[k++] = b[j++];\n}\nwhile (i < " + n1 + ") c[k++] = a[i++];\nwhile (j < " + n2 + ") c[k++] = b[j++];\nfor (int x = 0; x < k; x++)\n    printf(\"%d \", c[x]);";
+      return { text: "Merge two sorted arrays. What does this program print?", code: code, answer: sp(c), why: esc("Each time, the smaller front value goes into c. Both lists were sorted, so c comes out sorted."), prog: mainProg(code), out: sp(c) };
+    },
+    fn: function () {
+      var n = R(4, 5), m = rndArr(n, 2, 9), t = R(0, 5), k = R(0, n - 1), decl = "int m[" + n + "] = " + lit(m) + ";\n", fnc, body, ans, num = true, why;
+      if (t === 0) { fnc = "void doubleAll(int a[], int n) {\n    for (int i = 0; i < n; i++)\n        a[i] = a[i] * 2;\n}"; body = decl + "doubleAll(m, " + n + ");\nprintf(\"%d\", m[" + k + "]);"; ans = m[k] * 2; why = "An array is passed as the KEY to the original boxes, so the function really changes m. Without the function the answer would be " + m[k] + "."; }
+      else if (t === 1) { fnc = "void bump(int x) {\n    x = x + 1;\n}"; body = decl + "bump(m[" + k + "]);\nprintf(\"%d\", m[" + k + "]);"; ans = m[k]; why = "m[" + k + "] is ONE int, passed by value: bump works on a copy. m does not change."; }
+      else if (t === 2) { fnc = "void setFirst(int a[]) {\n    a[0] = 99;\n}"; body = decl + "setFirst(m);\nprintf(\"%d\", m[0]);"; ans = 99; why = "The whole array is passed, so a[0] inside the function is m[0] itself."; }
+      else if (t === 3) { fnc = "int total(int a[], int n) {\n    int s = 0;\n    for (int i = 0; i < n; i++)\n        s = s + a[i];\n    return s;\n}"; body = decl + "printf(\"%d\", total(m, " + n + "));"; ans = m.reduce(function (x, y) { return x + y; }, 0); why = "The function adds every box and returns the sum."; }
+      else if (t === 4) { var i = R(0, n - 2), j = R(i + 1, n - 1); fnc = "void swap2(int a[], int i, int j) {\n    int t = a[i];\n    a[i] = a[j];\n    a[j] = t;\n}"; body = decl + "swap2(m, " + i + ", " + j + ");\nprintf(\"%d %d\", m[" + i + "], m[" + j + "]);"; ans = m[j] + " " + m[i]; num = false; why = "swap2 works on the real array, so the two boxes really trade values."; }
+      else { fnc = "void inc(int x) {\n    x++;\n}"; body = decl + "for (int i = 0; i < " + n + "; i++)\n    inc(m[i]);\nint s = 0;\nfor (int i = 0; i < " + n + "; i++)\n    s = s + m[i];\nprintf(\"%d\", s);"; ans = m.reduce(function (x, y) { return x + y; }, 0); why = "inc gets copies of single values, so m never changes. The sum is the original sum."; }
+      return { text: "What does this program print?", code: fnc + "\n\n" + body, numeric: num, answer: ans, why: esc(why), prog: mainProg(body, fnc), out: String(ans) };
+    }
+  };
+
+  /* ---------- Class 3: matrices ---------- */
+  var SHAPES = [[2, 3], [3, 3], [3, 2], [2, 4]];
+  function mk(R_, C_) { var m = []; for (var i = 0; i < R_; i++) m.push(rndArr(C_, 1, 9)); return m; }
+  function mlit(m) { return "{" + m.map(function (r) { return "{" + r.join(", ") + "}"; }).join(", ") + "}"; }
+  function mdecl(m) { return "int m[" + m.length + "][" + m[0].length + "] = " + mlit(m) + ";"; }
+  function show(m) { return m.map(function (r) { return r.join(" "); }).join("\n"); }
+  var C3 = {
+    pick: function () {
+      var sh = pick(SHAPES), m = mk(sh[0], sh[1]), r = R(0, sh[0] - 1), c = R(0, sh[1] - 1), t = R(0, 1), code;
+      if (t === 0) code = mdecl(m) + '\nprintf("%d", m[' + r + '][' + c + ']);';
+      else { var r2 = R(0, sh[0] - 1), c2 = R(0, sh[1] - 1); code = mdecl(m) + '\nprintf("%d", m[' + r + '][' + c + '] + m[' + r2 + '][' + c2 + ']);'; return { text: "What does this program print?", code: code, numeric: true, answer: m[r][c] + m[r2][c2], why: "m[" + r + "][" + c + "] = " + m[r][c] + " and m[" + r2 + "][" + c2 + "] = " + m[r2][c2] + ". The FIRST number is the row, the SECOND is the column.", prog: mainProg(code), out: String(m[r][c] + m[r2][c2]) }; }
+      return { text: "What does this program print?", code: code, numeric: true, answer: m[r][c], why: "Row " + r + " is {" + m[r].join(", ") + "}. Its box number " + c + " is " + m[r][c] + ". Rows and columns both start at 0.", prog: mainProg(code), out: String(m[r][c]) };
+    },
+    tot: function () {
+      var sh = pick(SHAPES), m = mk(sh[0], sh[1]), R_ = sh[0], C_ = sh[1], t = R(0, 4), code, ans, why;
+      if (t === 0) { var r = R(0, R_ - 1); code = "int total = 0;\nfor (int j = 0; j < " + C_ + "; j++)\n    total = total + m[" + r + "][j];\nprintf(\"%d\", total);"; ans = m[r].reduce(function (x, y) { return x + y; }, 0); why = "j walks along row " + r + ": " + m[r].join(" + ") + " = " + ans + "."; }
+      else if (t === 1) { var c = R(0, C_ - 1); code = "int total = 0;\nfor (int i = 0; i < " + R_ + "; i++)\n    total = total + m[i][" + c + "];\nprintf(\"%d\", total);"; var col = m.map(function (x) { return x[c]; }); ans = col.reduce(function (x, y) { return x + y; }, 0); why = "i walks down column " + c + ": " + col.join(" + ") + " = " + ans + "."; }
+      else if (t === 2) { m = mk(3, 3); code = "int total = 0;\nfor (int i = 0; i < 3; i++)\n    total = total + m[i][i];\nprintf(\"%d\", total);"; ans = m[0][0] + m[1][1] + m[2][2]; why = "m[i][i] is the main diagonal: " + m[0][0] + " + " + m[1][1] + " + " + m[2][2] + " = " + ans + "."; R_ = 3; C_ = 3; }
+      else if (t === 3) { code = "int total = 0;\nfor (int i = 0; i < " + R_ + "; i++)\n    for (int j = 0; j < " + C_ + "; j++)\n        total = total + m[i][j];\nprintf(\"%d\", total);"; ans = m.reduce(function (x, r) { return x + r.reduce(function (p, q) { return p + q; }, 0); }, 0); why = "Two loops visit every box once: the sum of all values is " + ans + "."; }
+      else { code = "int big = m[0][0];\nfor (int i = 0; i < " + R_ + "; i++)\n    for (int j = 0; j < " + C_ + "; j++)\n        if (m[i][j] > big)\n            big = m[i][j];\nprintf(\"%d\", big);"; ans = Math.max.apply(null, m.map(function (r) { return Math.max.apply(null, r); })); why = "big keeps the largest value seen so far: " + ans + "."; }
+      var full = mdecl(m) + "\n" + code;
+      return { text: "What does this program print?", code: full, numeric: true, answer: ans, why: esc(why), prog: mainProg(full), out: String(ans) };
+    },
+    loop: function () {
+      var R_ = R(2, 3), C_ = R(3, 4), t = R(0, 3), expr, f, why;
+      if (t === 0) { expr = "i + j"; f = function (i, j) { return i + j; }; why = "Each box prints i + j: row 0 is 0 1 2 ..., row 1 starts at 1."; }
+      else if (t === 1) { expr = "i * j"; f = function (i, j) { return i * j; }; why = "Row 0 and column 0 are all 0, because anything times 0 is 0."; }
+      else if (t === 2) { expr = "i * " + C_ + " + j"; f = function (i, j) { return i * C_ + j; }; why = "This numbers the boxes 0, 1, 2, ... row by row, the same order C stores them in memory."; }
+      else { expr = "(i == j) ? 1 : 0"; f = function (i, j) { return i === j ? 1 : 0; }; why = "The condition i == j is true on the diagonal only, so 1 sits on the diagonal and 0 elsewhere."; }
+      var code = "for (int i = 0; i < " + R_ + "; i++) {\n    for (int j = 0; j < " + C_ + "; j++)\n        printf(\"%d \", " + expr + ");\n    printf(\"\\n\");\n}", out = [];
+      for (var i = 0; i < R_; i++) { var row = []; for (var j = 0; j < C_; j++) row.push(f(i, j)); out.push(row.join(" ")); }
+      return { text: "What does this program print? Type the numbers in order, with spaces.", code: code, answer: out.join(" "), why: esc(why + " Rows printed: " + out.join(" | ")), prog: mainProg(code), out: out.join(" ") };
+    },
+    tr: function () {
+      var t = R(0, 2);
+      if (t === 0) { var sh = pick([[2, 3], [3, 2], [2, 4], [3, 4]]); return { text: "A matrix has <b>" + sh[0] + " rows and " + sh[1] + " columns</b>. How many rows and columns does its <b>transpose</b> have?", options: opts4(sh[1] + " rows, " + sh[0] + " columns", [sh[0] + " rows, " + sh[1] + " columns", sh[0] + " rows, " + sh[0] + " columns", sh[1] + " rows, " + sh[1] + " columns"]), answer: sh[1] + " rows, " + sh[0] + " columns", why: "Transpose swaps rows and columns, so the shape swaps too." }; }
+      var sh2 = pick([[2, 3], [3, 2], [2, 4]]), m = mk(sh2[0], sh2[1]), a = R(0, sh2[1] - 1), b = R(0, sh2[0] - 1);
+      var code = mdecl(m) + "\nint t[" + sh2[1] + "][" + sh2[0] + "];\nfor (int i = 0; i < " + sh2[0] + "; i++)\n    for (int j = 0; j < " + sh2[1] + "; j++)\n        t[j][i] = m[i][j];\nprintf(\"%d\", t[" + a + "][" + b + "]);";
+      return { text: "What does this program print?", code: code, numeric: true, answer: m[b][a], why: "t[j][i] = m[i][j], so t[" + a + "][" + b + "] is m[" + b + "][" + a + "] = " + m[b][a] + ". The two indexes swap places.", prog: mainProg(code), out: String(m[b][a]) };
+    },
+    mem: function () {
+      var sh = pick([[2, 3], [3, 3], [3, 4], [2, 4]]), r = R(0, sh[0] - 1), c = R(0, sh[1] - 1), t = R(0, 1);
+      if (t === 0) { var code = "int m[" + sh[0] + "][" + sh[1] + "];\nint *p = &m[0][0];\nfor (int k = 0; k < " + (sh[0] * sh[1]) + "; k++)\n    p[k] = k;\nprintf(\"%d\", m[" + r + "][" + c + "]);"; return { text: "A matrix lives in memory as <b>one long line</b>, row after row. This program numbers that line 0, 1, 2, ... (the pointer line is a preview of Module 5). What does it print?", code: code, numeric: true, answer: r * sh[1] + c, why: "Box m[" + r + "][" + c + "] sits after " + r + " full rows of " + sh[1] + " boxes, plus " + c + " more: " + r + " × " + sh[1] + " + " + c + " = " + (r * sh[1] + c) + ".", prog: mainProg(code), out: String(r * sh[1] + c) }; }
+      var p = R(1, sh[0] * sh[1] - 1), rr = Math.floor(p / sh[1]), cc = p % sh[1], right = "m[" + rr + "][" + cc + "]";
+      return { text: "<b>int m[" + sh[0] + "][" + sh[1] + "];</b> is stored row by row in one line of boxes. Which element is in <b>box number " + p + "</b> (counting from 0)?", options: opts4(right, ["m[" + cc + "][" + rr + "]", "m[" + Math.min(sh[0] - 1, rr + 1) + "][" + cc + "]", "m[" + rr + "][" + Math.min(sh[1] - 1, cc + 1) + "]"]), mono: true, answer: right, why: "Divide by the number of columns: " + p + " ÷ " + sh[1] + " gives row " + rr + " with remainder " + cc + ". This is why a function needs the column count." };
+    },
+    fnm: function () {
+      var C_ = R(2, 4), R_ = R(2, 3), right = "void show(int m[][" + C_ + "], int rows)";
+      return { text: "In main: <b>int g[" + R_ + "][" + C_ + "];</b> Which function header can receive g?", options: opts4(right, ["void show(int m[][], int rows)", "void show(int m[" + R_ + "][], int rows)", "void show(int m[" + C_ + "][" + R_ + "], int rows)"]), mono: true, answer: right, why: "The function must know the column count to find m[i][j]. The row count can be left out (and is passed separately)." };
+    }
+  };
+
+  /* ---------- Class 3: strings ---------- */
+  var WORDS = ["CAT", "HELLO", "RIYA", "BANANA", "BHOPAL", "CODE", "IIIT", "ARRAY", "STRING", "DEBUG", "LOOP", "ZEBRA"];
+  var PAL = ["LEVEL", "MADAM", "NOON", "RADAR", "CODE", "HELLO", "MOUSE", "CIVIC", "ARRAY", "TENET"];
+  function rev(s) { return s.split("").reverse().join(""); }
+  function letters(w, ans) { var pool = (w + "XQZMKRW").split("").filter(function (c, i, a) { return a.indexOf(c) === i && c !== ans; }); return opts4(ans, shuffle(pool)); }
+  var C4 = {
+    box: function () {
+      var w = pick(WORDS), t = R(0, 3), n;
+      if (t === 0) return { text: "What does this program print?", code: 'char s[] = "' + w + '";\nprintf("%d", (int)sizeof(s));', numeric: true, answer: w.length + 1, why: "The boxes are the " + w.length + " letters PLUS one box for the END flag '\\0': " + (w.length + 1) + ".", prog: mainProg('char s[] = "' + w + '";\nprintf("%d", (int)sizeof(s));'), out: String(w.length + 1) };
+      if (t === 1) return { text: "What does this program print?", code: 'char s[] = "' + w + '";\nprintf("%d", (int)strlen(s));', numeric: true, answer: w.length, why: "strlen counts the letters and does NOT count the END flag: " + w.length + ".", prog: mainProg('char s[] = "' + w + '";\nprintf("%d", (int)strlen(s));'), out: String(w.length) };
+      if (t === 2) { n = w.length + R(3, 8); var c = 'char s[' + n + '] = "' + w + '";\nprintf("%d %d", (int)sizeof(s), (int)strlen(s));'; return { text: "What does this program print?", code: c, answer: n + " " + w.length, why: "sizeof is the number of BOXES (" + n + "). strlen is the letters before the first '\\0' (" + w.length + ").", prog: mainProg(c), out: n + " " + w.length }; }
+      return { text: "What is the <b>smallest</b> array size that can store the word <b>" + w + "</b> as a string?", numeric: true, answer: w.length + 1, why: w.length + " letters + 1 box for '\\0' = " + (w.length + 1) + ". Too small and the END flag does not fit." };
+    },
+    fetch: function () {
+      var w = pick(WORDS), t = R(0, 3), k, ans, code;
+      if (t === 0) { k = R(0, w.length - 1); ans = w[k]; code = 'char s[] = "' + w + '";\nprintf("%c", s[' + k + ']);'; return { text: "What does this program print? <b>s[k]</b> fetches the letter in box number k.", code: code, options: letters(w, ans), answer: ans, why: w.split("").map(function (c, i) { return "s[" + i + "] = " + c; }).join(", ") + ". Boxes start at 0.", prog: mainProg(code), out: ans }; }
+      if (t === 1) { ans = w[w.length - 1]; code = 'char s[] = "' + w + '";\nprintf("%c", s[strlen(s) - 1]);'; return { text: "What does this program print?", code: code, options: letters(w, ans), answer: ans, why: "strlen(s) is " + w.length + ". The last letter is in box " + (w.length - 1) + ", because s[" + w.length + "] is the END flag.", prog: mainProg(code), out: ans }; }
+      if (t === 2) { k = R(0, w.length - 1); var nw = pick("PQXYZ".split("")); code = 'char s[] = "' + w + '";\ns[' + k + "] = '" + nw + "';\nprintf(\"%s\", s);"; var o = w.slice(0, k) + nw + w.slice(k + 1); return { text: "What does this program print?", code: code, options: opts4(o, [w, w.slice(0, k) + w.slice(k + 1), nw + w.slice(1)]), mono: true, answer: o, why: "s[" + k + "] = '" + nw + "' replaces the letter in box " + k + ". A string in an array can be changed one box at a time.", prog: mainProg(code), out: o }; }
+      code = 'char s[] = "' + w + '";\nprintf("%d", s[' + w.length + ']);';
+      return { text: "What does this program print? (The last box of the string is not a letter.)", code: code, options: opts4("0", ["32", w.charCodeAt(w.length - 1) + "", "-1"]), mono: true, answer: "0", why: "s[" + w.length + "] is the END flag '\\0', whose number is 0.", prog: mainProg(code), out: "0" };
+    },
+    chr: function () {
+      var t = R(0, 6), code, ans, why, num = true, opt = null;
+      if (t === 0) { var ch = pick(["A", "B", "Z", "a", "b", "z", "0", "9", " "]); code = 'printf("%d", \'' + ch + "');"; ans = ch.charCodeAt(0); why = "A character is stored as a number (its ASCII code): '" + ch + "' is " + ans + "."; }
+      else if (t === 1) { var b = pick(["A", "B", "C", "M", "a", "d", "m"]), k = R(1, 3); code = 'printf("%c", \'' + b + "' + " + k + ");"; ans = String.fromCharCode(b.charCodeAt(0) + k); num = false; opt = letters(b, ans); why = "Letters are in a row of numbers: '" + b + "' + " + k + " moves " + k + " step(s) forward to '" + ans + "'."; }
+      else if (t === 2) { var d = R(0, 9); code = 'printf("%d", \'' + d + "' - '0');"; ans = d; why = "Digit characters are in order, so '" + d + "' − '0' gives the number " + d + ". Use this to turn a digit character into a number."; }
+      else if (t === 3) { var u = pick("ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")); code = 'printf("%c", \'' + u + "' + 32);"; ans = u.toLowerCase(); num = false; opt = letters(u, ans); why = "A lower-case letter is 32 more than its capital: '" + u + "' + 32 is '" + ans + "'."; opt = opts4(ans, [u, String.fromCharCode(u.charCodeAt(0) + 1), String.fromCharCode(u.charCodeAt(0) - 32 < 33 ? 63 : u.charCodeAt(0) - 32)]); }
+      else if (t === 4) { var lo = pick("abcdefghijklmnopqrstuvwxyz".split("")); code = 'printf("%c", toupper(\'' + lo + "'));"; ans = lo.toUpperCase(); num = false; opt = opts4(ans, [lo, String.fromCharCode(lo.charCodeAt(0) + 1).toUpperCase(), "?"]); why = "toupper (from ctype.h) turns a lower-case letter into its capital."; }
+      else if (t === 5) { var l = pick("abcdefgh".split("")); code = 'printf("%d", \'' + String.fromCharCode(l.charCodeAt(0) + R(2, 10)) + "' - '" + l + "');"; ans = null; var m = code.match(/'(.)' - '(.)'/); ans = m[1].charCodeAt(0) - m[2].charCodeAt(0); why = "Subtract the numbers: how many steps apart the two letters are in the alphabet is " + ans + "."; }
+      else { var d1 = R(1, 4), d2 = R(1, 4); code = 'printf("%d", (\'' + d1 + "' - '0') + ('" + d2 + "' - '0'));"; ans = d1 + d2; why = "Each digit character becomes a number first: " + d1 + " + " + d2 + " = " + ans + "."; }
+      var q = { text: "What does this program print?", code: code, why: esc(why), prog: mainProg(code), out: String(ans) };
+      if (opt) { q.options = opt; q.mono = true; q.answer = ans; } else if (num) { q.numeric = true; q.answer = ans; } else { q.answer = ans; }
+      return q;
+    },
+    loop: function () {
+      var t = R(0, 6), w = pick(WORDS), code, why, q;
+      if (t === 0) { code = 'char s[] = "' + w + '";\nint n = 0;\nwhile (s[n] != \'\\0\')\n    n++;\nprintf("%d", n);'; return { text: "What does this program print?", code: code, numeric: true, answer: w.length, why: "The loop walks until the END flag. n counts the letters: " + w.length + ".", prog: mainProg(code), out: String(w.length) }; }
+      if (t === 1) { var ws = ["BANANA", "LEVEL", "ARRAY", "MISSISSIPPI", "ABRACADABRA"], s = pick(ws), L = pick(s.split("")), cnt = s.split(L).length - 1; code = 'char s[] = "' + s + '";\nint count = 0;\nfor (int i = 0; s[i] != \'\\0\'; i++)\n    if (s[i] == \'' + L + "')\n        count++;\nprintf(\"%d\", count);"; return { text: "What does this program print?", code: code, numeric: true, answer: cnt, why: "count goes up each time the box holds '" + L + "'. It appears " + cnt + " time(s) in " + s + ".", prog: mainProg(code), out: String(cnt) }; }
+      if (t === 2) { code = 'char s[] = "' + w + '";\nfor (int i = strlen(s) - 1; i >= 0; i--)\n    printf("%c", s[i]);'; var r = rev(w); return { text: "What does this program print?", code: code, options: opts4(r, [w, r.slice(0, -1), w.slice(1)]), mono: true, answer: r, why: "i starts at the last letter and goes down to 0, so the word is printed backwards.", prog: mainProg(code), out: r }; }
+      if (t === 3) { var o = w.split("").filter(function (c, i) { return i % 2 === 0; }).join(""); code = 'char s[] = "' + w + '";\nfor (int i = 0; s[i] != \'\\0\'; i += 2)\n    printf("%c", s[i]);'; return { text: "What does this program print?", code: code, options: opts4(o, [w.split("").filter(function (c, i) { return i % 2 === 1; }).join(""), w, rev(o)]), mono: true, answer: o, why: "i goes 0, 2, 4, ...: every second letter, starting with the first.", prog: mainProg(code), out: o }; }
+      if (t === 4) { var mixed = pick(["Riya Sharma", "Iiit Bhopal", "Hello World", "Go To Class", "Code In C"]), up = mixed.split("").filter(function (c) { return c >= "A" && c <= "Z"; }).length; code = 'char s[] = "' + mixed + '";\nint count = 0;\nfor (int i = 0; s[i] != \'\\0\'; i++)\n    if (s[i] >= \'A\' && s[i] <= \'Z\')\n        count++;\nprintf("%d", count);'; return { text: "What does this program print?", code: code, numeric: true, answer: up, why: "The condition is true for capital letters only. The space and small letters are skipped. Capitals: " + up + ".", prog: mainProg(code), out: String(up) }; }
+      if (t === 5) { var p = pick(PAL), yes = p === rev(p); code = 'char s[] = "' + p + '";\nint i = 0, j = strlen(s) - 1, same = 1;\nwhile (i < j) {\n    if (s[i] != s[j]) same = 0;\n    i++;\n    j--;\n}\nif (same) printf("YES");\nelse printf("NO");'; return { text: "What does this program print?", code: code, options: ["YES", "NO"], answer: yes ? "YES" : "NO", why: "It compares the first letter with the last, then moves inwards. " + p + " reversed is " + rev(p) + (yes ? ": the same, so YES." : ": different, so NO."), prog: mainProg(code), out: yes ? "YES" : "NO" }; }
+      var v = pick(["EDUCATION", "PROGRAM", "BHOPAL", "OUTPUT", "STRING", "AUDIO"]), vc = v.split("").filter(function (c) { return "AEIOU".indexOf(c) >= 0; }).length;
+      code = 'char s[] = "' + v + '";\nint count = 0;\nfor (int i = 0; s[i] != \'\\0\'; i++) {\n    char c = s[i];\n    if (c == \'A\' || c == \'E\' || c == \'I\' || c == \'O\' || c == \'U\')\n        count++;\n}\nprintf("%d", count);';
+      return { text: "What does this program print?", code: code, numeric: true, answer: vc, why: "Count the letters A, E, I, O, U in " + v + ": " + vc + ".", prog: mainProg(code), out: String(vc) };
+    },
+    lib: function () {
+      var t = R(0, 6), w = pick(WORDS), code;
+      if (t === 0) { code = 'char a[] = "' + w + '", b[] = "' + w + '";\nif (strcmp(a, b) == 0) printf("Same");\nelse printf("Different");'; return { text: "What does this program print?", code: code, options: ["Same", "Different"], answer: "Same", why: "strcmp returns 0 when the two strings have the same letters.", prog: mainProg(code), out: "Same" }; }
+      if (t === 1) { code = 'char a[] = "' + w + '", b[] = "' + w + '";\nif (a == b) printf("Same");\nelse printf("Different");'; return { text: "Both arrays hold the same word. What does this program print?", code: code, options: ["Same", "Different"], answer: "Different", why: "== on two arrays compares WHERE they are in memory, not the letters. Two separate arrays are never at the same place. Use strcmp.", prog: mainProg(code), out: "Different" }; }
+      if (t === 2) { var k = R(0, w.length - 1), c = pick("XYZ".split("")); code = 'char a[10] = "' + w + '", b[10];\nstrcpy(b, a);\nb[' + k + "] = '" + c + "';\nprintf(\"%s %s\", a, b);"; var bb = w.slice(0, k) + c + w.slice(k + 1), a2 = w + " " + bb; return { text: "What does this program print?", code: code, options: opts4(a2, [bb + " " + bb, w + " " + w, bb + " " + w]), mono: true, answer: a2, why: "strcpy gives b its OWN copy of the letters. Changing b does not change a.", prog: mainProg(code), out: a2 }; }
+      if (t === 3) { var w2 = pick(WORDS); code = 'char a[20] = "' + w + '";\nstrcat(a, "' + w2 + '");\nprintf("%s", a);'; return { text: "What does this program print?", code: code, answer: w + w2, why: "strcat sticks the second string on the end of the first, right after the last letter.", prog: mainProg(code), out: w + w2 }; }
+      if (t === 4) { var w3 = pick(WORDS); code = 'char a[20] = "' + w + '";\nstrcat(a, "' + w3 + '");\nprintf("%d", (int)strlen(a));'; return { text: "What does this program print?", code: code, numeric: true, answer: w.length + w3.length, why: "After strcat the string has " + w.length + " + " + w3.length + " = " + (w.length + w3.length) + " letters.", prog: mainProg(code), out: String(w.length + w3.length) }; }
+      var P = [["APPLE", "BANANA"], ["CAT", "DOG"], ["MANGO", "MANGO"], ["ZEBRA", "ANT"], ["PEN", "PENCIL"], ["BHOPAL", "DELHI"], ["DOG", "CAT"]], pr = pick(P), x = pr[0], y = pr[1], r = x < y ? -1 : x > y ? 1 : 0;
+      code = 'int r = strcmp("' + x + '", "' + y + '");\nif (r < 0) printf("first is smaller");\nelse if (r > 0) printf("first is bigger");\nelse printf("same");';
+      var ans = r < 0 ? "first is smaller" : r > 0 ? "first is bigger" : "same";
+      return { text: "strcmp compares letter by letter in dictionary order. What does this program print?", code: code, options: ["first is smaller", "first is bigger", "same"], answer: ans, why: r === 0 ? "Same letters, so strcmp returns 0." : (r < 0 ? x + " comes before " + y + " in dictionary order, so the result is negative." : x + " comes after " + y + " in dictionary order, so the result is positive."), prog: mainProg(code), out: ans };
+    },
+    io: function () {
+      var P = ["Riya Sharma", "Asha Rao", "Ravi Kumar", "Sachin Bhopal", "Om Prakash"], nm = pick(P), t = R(0, 4), first = nm.split(" ")[0], code;
+      if (t === 0) { code = 'char name[30];\nscanf("%s", name);\nprintf("%s", name);'; return { text: "You type <b>" + nm + "</b> and press Enter. What does this program print?", code: code, options: opts4(first, [nm, nm.split(" ")[1], ""]).filter(function (o) { return o !== ""; }), mono: true, answer: first, why: "scanf with %s stops at the first space (or Enter). Only the first word is stored.", stdin: nm + "\n", prog: mainProg(code), out: first }; }
+      if (t === 1) { code = 'char name[30];\nfgets(name, sizeof(name), stdin);\nprintf("%s", name);'; return { text: "You type <b>" + nm + "</b> and press Enter. What does this program print? (The line after it is not shown.)", code: code, options: opts4(nm, [first, nm.split(" ")[1], nm.replace(" ", "")]), mono: true, answer: nm, why: "fgets reads the WHOLE line, spaces included.", stdin: nm + "\n", prog: mainProg(code), out: nm }; }
+      if (t === 2) { code = 'char name[30];\nfgets(name, sizeof(name), stdin);\nprintf("%d", (int)strlen(name));'; return { text: "You type <b>" + nm + "</b> and press Enter. What does this program print? (Count carefully.)", code: code, numeric: true, answer: nm.length + 1, why: "fgets also stores the Enter key as '\\n'. " + nm.length + " letters + 1 for '\\n' = " + (nm.length + 1) + ".", stdin: nm + "\n", prog: mainProg(code), out: String(nm.length + 1) }; }
+      if (t === 3) { code = 'char name[30];\nscanf("%s", name);\nprintf("%d", (int)strlen(name));'; return { text: "You type <b>" + nm + "</b> and press Enter. What does this program print?", code: code, numeric: true, answer: first.length, why: "scanf stored only \"" + first + "\" (no space, no '\\n'): " + first.length + " letters.", stdin: nm + "\n", prog: mainProg(code), out: String(first.length) }; }
+      var size = R(4, 6), word = pick(["Bhopal", "Programming", "Keyboard", "Institute"]), stored = word.slice(0, size - 1);
+      code = 'char name[' + size + '];\nfgets(name, ' + size + ', stdin);\nprintf("%s", name);';
+      return { text: "You type <b>" + word + "</b> and press Enter. What does this program print?", code: code, options: opts4(stored, [word.slice(0, size), word, word.slice(0, size - 2)]), mono: true, answer: stored, why: "fgets(name, " + size + ", ...) fills at most " + size + " boxes and always keeps the LAST one for '\\0'. So only " + (size - 1) + " letters are stored. That is why we pass the size of the array.", stdin: word + "\n", prog: mainProg(code), out: stored };
+    }
+  };
+
+  /* ---------- Beyond the class: traps ---------- */
+  var TRAPS = [
+    { text: "Reading outside an array", code: "int a[3] = {1, 2, 3};\nprintf(\"%d\", a[3]);", opts: ["Compiler error", "Always prints 0", "Undefined: may print garbage or crash", "Always crashes with a message"], ans: "Undefined: may print garbage or crash", why: "C does not check the index. a[3] is the box AFTER the last one, so the result is unpredictable. Always keep i < size." },
+    { text: "A global array and a local array", code: "int g[3];\nint main(void) {\n    int l[3];\n    printf(\"%d %d\", g[0], l[0]);\n}", opts: ["0 and garbage", "0 and 0", "garbage and garbage", "Compiler error"], ans: "0 and garbage", why: "Global arrays start as 0. A local array that you never fill holds leftover junk. Always initialise: int l[3] = {0};" },
+    { text: "What does {1} do?", code: "int a[4] = {1};\nprintf(\"%d %d %d %d\", a[0], a[1], a[2], a[3]);", opts: ["1 1 1 1", "1 0 0 0", "1 garbage garbage garbage", "Compiler error"], ans: "1 0 0 0", why: "Only the first box gets 1. All the boxes you did not list are set to 0. (So {0} is the short way to zero a whole array.)" },
+    { text: "Copying an array", code: "int a[3] = {1, 2, 3};\nint b[3];\nb = a;", opts: ["Copies all three values", "Compiler error: arrays cannot be assigned", "Makes b point to a", "Copies only a[0]"], ans: "Compiler error: arrays cannot be assigned", why: "An array is a block of boxes, not one value. Copy it with a loop (b[i] = a[i]) or later with memcpy." },
+    { text: "Comparing two arrays", code: "int a[3] = {1, 2, 3};\nint b[3] = {1, 2, 3};\nif (a == b) printf(\"Equal\");\nelse printf(\"Not equal\");", opts: ["Equal", "Not equal", "Compiler error", "Depends on the compiler"], ans: "Not equal", why: "== compares where the arrays are in memory, not what is inside. Compare with a loop, box by box." },
+    { text: "sizeof inside a function", code: "void f(int a[]) {\n    printf(\"%d\", (int)sizeof(a));\n}\nint main(void) {\n    int x[5] = {0};\n    f(x);\n}", opts: ["20", "5", "The size of an address (8 on most PCs)", "4"], ans: "The size of an address (8 on most PCs)", why: "Inside the function, a is only the key (an address), so sizeof gives the size of an address, not of the 5 boxes. That is why we pass n as a separate parameter." },
+    { text: "Which one is the same as a[2]?", opts: ["*(a + 2)", "*a + 2", "a + 2", "&a[2]"], ans: "*(a + 2)", why: "The array name is the address of box 0. a + 2 is the address two boxes on, and * opens that box. So a[2] and *(a + 2) are the same. (You will use this in Module 5.)" },
+    { text: "A string without an end flag", code: "char s[3] = {'C', 'A', 'T'};\nprintf(\"%s\", s);", opts: ["CAT", "CAT, then maybe garbage letters", "Compiler error", "CA"], ans: "CAT, then maybe garbage letters", why: "%s keeps printing until it finds '\\0'. This array has no end flag, so printf runs past the end. A string of 3 letters needs 4 boxes." },
+    { text: "Why is there no & in scanf for a string?", code: "char name[20];\nscanf(\"%s\", name);", opts: ["The name of an array already is its address", "& is not allowed for char", "Strings do not need memory", "It is a mistake that happens to work"], ans: "The name of an array already is its address", why: "scanf needs the ADDRESS to store into. An array name already gives the address of its first box. A single int needs &x because x is a value." },
+    { text: "Comparing a string with ==", code: "char s[] = \"CAT\";\nif (s == \"CAT\") printf(\"Match\");\nelse printf(\"No match\");", opts: ["Match", "No match", "Compiler error", "Match only if lower case"], ans: "No match", why: "== compares addresses of two different places in memory. To compare letters, use strcmp(s, \"CAT\") == 0." },
+    { text: "Turn a digit character into a number", code: "char c = '7';\nint n = c - '0';\nprintf(\"%d\", n);", opts: ["7", "55", "0", "Compiler error"], ans: "7", why: "'7' is stored as its code 55 and '0' as 48. The difference is 7. Without - '0' you get 55." },
+    { text: "Which header gives toupper and isdigit?", opts: ["ctype.h", "string.h", "stdio.h", "math.h"], ans: "ctype.h", why: "ctype.h has the character functions: toupper, tolower, isalpha, isdigit, isspace. string.h has the string functions: strlen, strcpy, strcmp, strcat." },
+    { text: "Half-filled matrix", code: "int m[2][3] = {{1}, {4, 5}};\nprintf(\"%d %d\", m[0][2], m[1][2]);", opts: ["0 0", "1 5", "garbage garbage", "Compiler error"], ans: "0 0", why: "Boxes you do not list are 0, row by row: row 0 is 1 0 0 and row 1 is 4 5 0." },
+    { text: "What sits next to m[0][2] in memory?", code: "int m[2][3];", opts: ["m[1][0]", "m[0][3]", "m[2][0]", "m[1][2]"], ans: "m[1][0]", why: "Rows are stored one after another: m[0][0], m[0][1], m[0][2], then m[1][0], ... That is why the function needs the column count." },
+    { text: "The average that lost its decimals", code: "int total = 7, n = 2;\nfloat avg = total / n;\nprintf(\"%.2f\", avg);", opts: ["3.50", "3.00", "4.00", "Compiler error"], ans: "3.00", why: "total / n is an INT division (7 / 2 = 3) done before the result goes into the float. Write (float)total / n to get 3.50." },
+    { text: "The safe way to read a line", opts: ["fgets(name, sizeof(name), stdin);", "gets(name);", "scanf(\"%s\", name); (always safe for any length)", "They are all equally safe"], ans: "fgets(name, sizeof(name), stdin);", why: "gets cannot know the size of name, so a long line overwrites memory beyond the array (it was removed from the C standard). fgets takes the size and stops in time." },
+    { text: "Where does a string end?", code: "char s[] = \"AB\\0CD\";\nprintf(\"%d\", (int)strlen(s));", opts: ["2", "5", "4", "6"], ans: "2", why: "strlen and %s stop at the FIRST '\\0'. The letters C and D are in the array but are not part of the string." },
+    { text: "Strings of length zero", code: "char s[] = \"\";\nprintf(\"%d %d\", (int)strlen(s), (int)sizeof(s));", opts: ["0 1", "0 0", "1 1", "1 0"], ans: "0 1", why: "An empty string has no letters, but it still has one box for '\\0'. strlen = 0, sizeof = 1." }
+  ];
+  var TR = {
+    q: function () { var x = pick(TRAPS); return { text: "<b>" + esc(x.text) + "</b>", code: x.code, options: shuffle(x.opts), mono: !x.code ? true : false, answer: x.ans, why: esc(x.why) }; }
+  };
+
+  /* ---------- Missing lines and bugs ---------- */
+  var MISS = [
+    { code: "for (int i = n; i > pos; i--)\n    ______\na[pos] = value;\nn++;", opts: ["a[i] = a[i - 1];", "a[i - 1] = a[i];", "a[i] = a[i + 1];", "a[pos] = a[i];"], ans: "a[i] = a[i - 1];", why: "To insert, make a gap: move values right, starting from the END so none is overwritten." },
+    { code: "for (int i = pos; i < n - 1; i++)\n    ______\nn--;", opts: ["a[i] = a[i + 1];", "a[i + 1] = a[i];", "a[i] = a[i - 1];", "a[pos] = a[i];"], ans: "a[i] = a[i + 1];", why: "To delete, move every later value one box LEFT over the deleted one." },
+    { code: "for (int i = pos; i < n - 1; i++)\n    a[i] = a[i + 1];\n______", opts: ["n--;", "n++;", "a[n] = 0;", "pos--;"], ans: "n--;", why: "The list is now one shorter, so n must go down by one." },
+    { code: "int found = -1;\nfor (int i = 0; i < n; i++)\n    if (______) { found = i; break; }", opts: ["a[i] == key", "a[i] = key", "i == key", "a == key"], ans: "a[i] == key", why: "Compare the value in box i with the key. Use == for comparing and = only for storing." },
+    { code: "int max = a[0];\nfor (int i = 1; i < n; i++)\n    if (a[i] > max)\n        ______", opts: ["max = a[i];", "max = i;", "a[i] = max;", "max++;"], ans: "max = a[i];", why: "Remember the VALUE that is bigger, not its index." },
+    { code: "int total = 0;\nfor (int i = 0; ______; i++)\n    total = total + a[i];", opts: ["i < n", "i <= n", "i < n - 1", "i == n"], ans: "i < n", why: "For n elements the indexes are 0 to n − 1, so the loop runs while i < n." },
+    { code: "int t = a[i];\na[i] = a[n - 1 - i];\n______", opts: ["a[n - 1 - i] = t;", "a[i] = t;", "t = a[n - 1 - i];", "a[n - i] = t;"], ans: "a[n - 1 - i] = t;", why: "Swap with a helper: after a[i] got the other value, the other box takes the saved t." },
+    { code: "int rowsum = 0;\nfor (int j = 0; j < 3; j++)\n    ______", opts: ["rowsum = rowsum + m[i][j];", "rowsum = rowsum + m[j][i];", "rowsum = m[i][j];", "rowsum = rowsum + m[j][j];"], ans: "rowsum = rowsum + m[i][j];", why: "Row i is fixed, and j walks along it. Add each value to the running total." },
+    { code: "for (int i = 0; i < R; i++)\n    for (int j = 0; j < C; j++)\n        t[j][i] = ______;", opts: ["m[i][j]", "m[j][i]", "t[i][j]", "m[i][i]"], ans: "m[i][j]", why: "Transpose: the value from row i, column j goes to row j, column i." },
+    { code: "int n = 0;\nwhile (______)\n    n++;", opts: ["s[n] != '\\0'", "s[n] == '\\0'", "n != '\\0'", "s != '\\0'"], ans: "s[n] != '\\0'", why: "Keep counting while the current box is NOT the END flag." },
+    { code: "for (int i = strlen(s) - 1; ______; i--)\n    printf(\"%c\", s[i]);", opts: ["i >= 0", "i > 0", "i <= 0", "i < 0"], ans: "i >= 0", why: "Box 0 is the first letter, and it must be printed too. i > 0 would skip it." },
+    { code: "if (______)\n    printf(\"Same\");", opts: ["strcmp(a, b) == 0", "a == b", "strcmp(a, b) == 1", "strcmp(a, b)"], ans: "strcmp(a, b) == 0", why: "strcmp returns 0 when the strings are equal. == on two arrays compares addresses, and strcmp(a, b) alone is true when they are DIFFERENT." },
+    { code: "fgets(s, sizeof(s), stdin);\ns[strcspn(s, \"\\n\")] = ______;", opts: ["'\\0'", "'\\n'", "' '", "'0'"], ans: "'\\0'", why: "We want the string to end where the newline was, so put the END flag there." }
+  ];
+  var BUGS = [
+    { code: "1  int a[5] = {1, 2, 3, 4, 5};\n2  int total = 0;\n3  for (int i = 0; i <= 5; i++)\n4      total = total + a[i];\n5  printf(\"%d\", total);", ans: "Line 3", why: "i <= 5 reaches a[5], which does not exist. Use i < 5." },
+    { code: "1  int a[10] = {1, 2, 3, 4, 5};\n2  int n = 5, pos = 1;\n3  for (int i = pos; i < n - 1; i++)\n4      a[i + 1] = a[i];\n5  n--;", ans: "Line 4", why: "Deleting moves values LEFT: a[i] = a[i + 1]. This line copies the wrong way and just spreads one value." },
+    { code: "1  int low = 0, high = n - 1;\n2  while (low <= high) {\n3      int mid = (low + high) / 2;\n4      if (a[mid] == key) break;\n5      else if (a[mid] < key) low = mid;\n6      else high = mid - 1;\n7  }", ans: "Line 5", why: "low = mid can repeat forever. The middle is already checked, so move low to mid + 1." },
+    { code: "1  char name[5];\n2  printf(\"Enter your name: \");\n3  fgets(name, 20, stdin);\n4  printf(\"Hello %s\", name);", ans: "Line 3", why: "The array has 5 boxes but fgets may write up to 20. The size given to fgets must be the size of the array: sizeof(name)." },
+    { code: "1  char a[] = \"CAT\", b[] = \"CAT\";\n2  if (a == b)\n3      printf(\"Same\");\n4  else\n5      printf(\"Different\");", ans: "Line 2", why: "== compares memory places, not letters. Use strcmp(a, b) == 0." },
+    { code: "1  int m[2][3] = {{1, 2, 3}, {4, 5, 6}};\n2  for (int i = 0; i < 2; i++)\n3      for (int j = 0; j < 2; j++)\n4          printf(\"%d \", m[i][j]);", ans: "Line 3", why: "Each row has 3 columns, so j must go up to 2. The loop stops after 2 values per row." },
+    { code: "1  void show(int m[][], int rows) {\n2      for (int i = 0; i < rows; i++)\n3          for (int j = 0; j < 3; j++)\n4              printf(\"%d \", m[i][j]);\n5  }", ans: "Line 1", why: "The function needs the column count: int m[][3]. Without it C cannot find m[i][j]." },
+    { code: "1  int a[5] = {2, 4, 6, 8, 10};\n2  int total = 0;\n3  for (int i = 0; i < 5; i++)\n4      total = total + a[i];\n5  float avg = total / 5;\n6  printf(\"%.2f\", avg);", ans: "Line 5", why: "total / 5 is an int division (30 / 5 is fine, but 31 / 5 would lose .2). Write (float)total / 5." },
+    { code: "1  int a[5] = {3, 5, 7, 9, 11};\n2  int n = sizeof(a);\n3  for (int i = 0; i < n; i++)\n4      printf(\"%d \", a[i]);", ans: "Line 2", why: "sizeof(a) is the number of BYTES (20), not the number of elements. Divide by sizeof(a[0])." },
+    { code: "1  char s[] = \"Hello\";\n2  int count = 0;\n3  for (int i = 0; s[i] != '\\0'; i++)\n4      if (s[i] = 'l')\n5          count++;", ans: "Line 4", why: "A single = STORES 'l' into the box (and is always true). Comparing needs ==." },
+    { code: "1  char s[] = \"LEVEL\";\n2  int n = strlen(s);\n3  for (int i = 0; i < n / 2; i++)\n4      if (s[i] != s[n - i])\n5          printf(\"Not palindrome\");", ans: "Line 4", why: "The partner of s[i] is s[n - 1 - i]. s[n - i] is off by one (and for i = 0 it is the END flag)." }
+  ];
+  var FIX = {
+    miss: function () { var x = pick(MISS); return { text: "Which line goes in the blank?", code: x.code, options: shuffle(x.opts), mono: true, answer: x.ans, why: esc(x.why) }; },
+    bug: function () { var x = pick(BUGS); var n = x.code.split("\n").length, opts = []; for (var i = 1; i <= n; i++) opts.push("Line " + i);
+      return { text: "Which line has the bug?", code: x.code, options: opts, answer: x.ans, why: esc(x.why) }; }
+  };
+
+var GEN = { c1: C1, c2: C2, c3: C3, str: C4, trap: TR, fix: FIX }, MODE = { c1: "pr", c2: "ins", c3: "pick", str: "box", trap: "q", fix: "miss" }, last = {};
+  function next(k) { var g = GEN[k][MODE[k]]; var q, tries = 0; do { q = g(); tries++; } while (tries < 5 && last[k] && q.code === last[k].code && q.text === last[k].text); last[k] = q; render(k, q); }
+  document.querySelectorAll("[data-mode]").forEach(function (b) { b.addEventListener("click", function () {
+    var k = b.dataset.tab; MODE[k] = b.dataset.mode;
+    document.querySelectorAll('[data-tab="' + k + '"]').forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+    next(k); }); });
+  document.querySelectorAll("[data-next]").forEach(function (b) { b.addEventListener("click", function () { next(b.dataset.next); }); });
+  /* tabs */
+  var tabs = document.querySelectorAll(".tab");
+  tabs.forEach(function (t) { t.addEventListener("click", function () { tabs.forEach(function (x) { x.setAttribute("aria-selected", x === t ? "true" : "false"); $(x.getAttribute("aria-controls")).hidden = x !== t; }); }); });
+  /* ask the assistant */
+  var ASSISTANT_URL = "https://notebook.google.com/notebook/31641453-8368-4b9e-b5aa-3b02dd2b8961";
+  if (ASSISTANT_URL) $("ask-link").href = ASSISTANT_URL; else $("ask-link").style.display = "none";
+  $("copy-q").addEventListener("click", function () {
+    var p = document.querySelector(".panel:not([hidden])"), tab = document.querySelector('.tab[aria-selected="true"]').textContent;
+    var k = p.id.replace("p-", ""), q = cur[k] && cur[k].q;
+    var text = "FoCP Module 4, Play with Concepts, " + tab + ":\n\n" + (q ? q.text.replace(/<[^>]+>/g, " ") + (q.code ? "\n\n" + q.code : "") + (q.options ? "\n\nOptions: " + q.options.join(" | ") : "") : "") + "\n\nI'm stuck. Please give me a hint, not the full answer.";
+    function done() { $("copied").textContent = "Copied"; setTimeout(function () { $("copied").textContent = ""; }, 2000); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fb2); else fb2();
+    function fb2() { var ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); done(); } catch (e) {} document.body.removeChild(ta); }
+  });
+  ["c1", "c2", "c3", "str", "trap", "fix"].forEach(next);
+  window.__GEN = GEN;
+})();
+</script>
+</body>
+</html>
